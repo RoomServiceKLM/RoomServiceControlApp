@@ -13,8 +13,6 @@
 :root{--black:#111;--ink:#111;--muted:#777;--yellow:#F8AC00;--yellow-dark:#D18F00;--yellow-soft:#FFF7E1;--paper:#fff;--bg:#F3F3F3;--soft:#F7F7F7;--line:#D8D8D8;--danger:#B42318;--danger-soft:#FFF0ED;--ok:#17633A;--blue:#1E5AA8;--blue-soft:#E8F0FE;--shadow:0 8px 24px rgba(111,70,0,.08)}
 *{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Jost,Arial,sans-serif;overflow-x:hidden}
 button,input{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sans",Arial,sans-serif;margin:0}
-
-/* LOGIN */
 .login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(150deg,#f8edcf,var(--yellow-soft))}
 .login-card{width:min(400px,100%);background:var(--paper);border-radius:20px;box-shadow:var(--shadow);padding:36px 28px;text-align:center}
 .login-card img{height:42px;margin-bottom:18px}
@@ -27,10 +25,9 @@ button,input{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sa
 .login-btn{width:100%;border:0;border-radius:12px;padding:14px;background:var(--yellow);color:#111;font-family:"Josefin Sans";font-size:14px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 18px rgba(209,143,0,.22);transition:.2s;margin-top:4px}
 .login-btn:hover{background:var(--yellow-dark)}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
-.login-error{background:var(--danger-soft);color:var(--danger);border:1px solid #F2B8B0;border-radius:10px;padding:11px 14px;font-size:13px;font-weight:600;margin-top:14px}
+.login-error{background:var(--danger-soft);color:var(--danger);border:1px solid #F2B8B0;border-radius:10px;padding:11px 14px;font-size:13px;font-weight:600;margin-top:14px;text-align:left;white-space:pre-line}
+.login-info{background:var(--yellow-soft);color:#654b08;border:1px solid #E2C879;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;margin-top:10px;text-align:left}
 .hidden{display:none!important}
-
-/* APP */
 .app{display:none}
 .topbar{background:var(--black);border-bottom:3px solid var(--yellow);position:sticky;top:0;z-index:100}
 .topbar__inner{max-width:1400px;margin:auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -40,10 +37,7 @@ button,input{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sa
 .refresh-btn,.logout-btn{border:1.5px solid #fff;background:transparent;color:#fff;border-radius:999px;padding:6px 12px;font-family:"Josefin Sans";font-size:10px;font-weight:800;letter-spacing:1px;cursor:pointer;transition:.2s}
 .refresh-btn:hover,.logout-btn:hover{background:#fff;color:#111}
 .spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-
 .layout{max-width:1400px;margin:auto;padding:16px}
-
-/* CARDS */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:.15s}
 .card:hover{transform:translateY(-2px)}
@@ -56,8 +50,6 @@ button,input{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sa
 .card.pickup-pending .num{color:var(--danger)}
 .card.pickup-requested .num{color:var(--yellow-dark)}
 .card.pickup-way .num{color:#1E5AA8}
-
-/* TABLE */
 .table-wrap{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
 .table-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--soft)}
 .table-head h2{font-size:13px;letter-spacing:1.5px;text-transform:uppercase}
@@ -76,7 +68,6 @@ tbody tr:hover{background:#fafafa}
 .status-requested{background:var(--yellow-soft);color:var(--yellow-dark)}
 .status-way{background:#E8F0FE;color:var(--blue)}
 .status-completed{background:#E8F5E9;color:var(--ok)}
-
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 .action-btn{border:0;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;font-family:Jost}
 .action-btn:hover{opacity:.85}
@@ -86,10 +77,7 @@ tbody tr:hover{background:#fafafa}
 .btn-pickup-way{background:var(--blue);color:#fff}
 .btn-pickup-done{background:var(--ok);color:#fff}
 .btn-collect{background:var(--ok);color:#fff}
-
 .empty{padding:40px;text-align:center;color:var(--muted);font-size:14px}
-
-/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
 .modal-overlay.open{display:flex}
 .modal{background:var(--paper);border-radius:16px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
@@ -103,17 +91,11 @@ tbody tr:hover{background:#fafafa}
 .modal__row span:last-child{font-weight:700}
 .modal__actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
 .modal__actions button{flex:1;min-width:140px}
-
-/* DELIVERY TYPE SELECT */
 .delivery-types{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
 .delivery-type-btn{border:1.5px solid var(--line);border-radius:10px;padding:12px;background:#fff;text-align:center;font-weight:700;font-size:12px;cursor:pointer;transition:.15s}
 .delivery-type-btn:hover{border-color:var(--yellow);background:var(--yellow-soft)}
-
-/* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-
-/* MOBILE */
 @media(max-width:760px){.cards{grid-template-columns:repeat(3,1fr)}.table-body{font-size:12px}th,td{padding:10px 8px}.actions{gap:4px}.action-btn{padding:6px 8px;font-size:10px}}
 @media(max-width:520px){.cards{grid-template-columns:repeat(2,1fr)}.topbar__user{display:none}.layout{padding:10px}}
 </style>
@@ -131,11 +113,12 @@ tbody tr:hover{background:#fafafa}
       <input id="loginUser" placeholder="Ej: USR-MARLEN" autocomplete="off">
     </div>
     <div class="login-field">
-      <label>Contraseña</label>
-      <input id="loginPass" type="password" placeholder="Tu contraseña">
+      <label>Contraseña (apellido)</label>
+      <input id="loginPass" type="password" placeholder="Tu apellido">
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Entrar</button>
     <div id="loginError" class="login-error hidden"></div>
+    <div class="login-info">Usuarios: USR-MARLEN, USR-SANDRA, USR-HELENA, USR-GONZALO, USR-GUSTAVO, USR-ALEJANDRO, USR-RAFA, USR-IGNACIO, USR-IVAN. Contraseña = apellido.</div>
   </div>
 </div>
 
@@ -146,7 +129,7 @@ tbody tr:hover{background:#fafafa}
       <div class="topbar__title">Room Service Control</div>
       <div class="topbar__user" id="userDisplay"></div>
       <div class="topbar__actions">
-        <button class="refresh-btn" id="refreshBtn" onclick="loadDashboard()">↻ Actualizar</button>
+        <button class="refresh-btn" id="refreshBtn" onclick="loadDashboard()">&#x21bb; Actualizar</button>
         <button class="logout-btn" onclick="doLogout()">Salir</button>
       </div>
     </div>
@@ -191,7 +174,7 @@ tbody tr:hover{background:#fafafa}
             <tr>
               <th>ID</th>
               <th>Hab</th>
-              <th>Huésped</th>
+              <th>Huesped</th>
               <th>Servicio</th>
               <th>Estado</th>
               <th>Recogida</th>
@@ -247,7 +230,7 @@ const DELIVERY_LABELS = {
   TABLE_TROLLEY: 'Mesa/trolley',
   TRAY: 'Bandeja',
   DRINKS_ONLY: 'Solo bebida',
-  DRINKS_GLASSWARE: 'Bebidas/cristalería',
+  DRINKS_GLASSWARE: 'Bebidas/cristaleria',
   CROCKERY: 'Vajilla',
   OTHER: 'Otro'
 };
@@ -263,23 +246,41 @@ function doLogin() {
   const pass = $('loginPass').value.trim();
   if (!userId || !pass) return showLoginError('Introduce usuario y contraseña.');
   $('loginBtn').disabled = true;
+  
   fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'login', userId, password: pass })
+    body: JSON.stringify({ action: 'login', userId: userId, password: pass })
   })
-  .then(r => r.json())
-  .then(data => {
+  .then(function(r) {
+    return r.json().then(function(data) {
+      return { status: r.status, data: data };
+    });
+  })
+  .then(function(res) {
     $('loginBtn').disabled = false;
-    if (!data.ok) return showLoginError(data.error || 'Error de login.');
-    sessionToken = data.sessionToken;
-    user = data.user;
+    console.log('Login response:', res);
+    
+    if (!res.data.ok) {
+      var err = res.data.error || 'Error desconocido';
+      if (res.status === 401) err = 'Usuario o contraseña incorrectos.';
+      if (res.status === 403) err = 'Acceso denegado.';
+      if (res.status === 500) err = 'Error del servidor.';
+      return showLoginError('Error (' + res.status + '): ' + err);
+    }
+    
+    sessionToken = res.data.sessionToken;
+    user = res.data.user;
     localStorage.setItem('rs_sessionToken', sessionToken);
     localStorage.setItem('rs_user', JSON.stringify(user));
     showApp();
     loadDashboard();
   })
-  .catch(() => { $('loginBtn').disabled = false; showLoginError('Error de conexión.'); });
+  .catch(function(err) {
+    $('loginBtn').disabled = false;
+    console.error('Login fetch error:', err);
+    showLoginError('Error de conexion. Comprueba tu internet.\n\nSi usas iPhone, prueba con WiFi.');
+  });
 }
 
 function doLogout() {
@@ -287,8 +288,8 @@ function doLogout() {
     fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'logout', sessionToken })
-    }).catch(()=>{});
+      body: JSON.stringify({ action: 'logout', sessionToken: sessionToken })
+    }).catch(function() {});
   }
   sessionToken = '';
   user = null;
@@ -314,13 +315,13 @@ function loadDashboard() {
   fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'dashboard', sessionToken })
+    body: JSON.stringify({ action: 'dashboard', sessionToken: sessionToken })
   })
-  .then(r => r.json())
-  .then(data => {
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
     $('refreshBtn').classList.remove('spin');
     if (!data.ok) {
-      if (String(data.error || '').toLowerCase().includes('sesión') || String(data.error || '').toLowerCase().includes('session')) {
+      if (String(data.error || '').toLowerCase().indexOf('sesion') !== -1 || String(data.error || '').toLowerCase().indexOf('session') !== -1) {
         doLogout();
       }
       return toast(data.error || 'Error cargando datos');
@@ -329,9 +330,9 @@ function loadDashboard() {
     updateCounts(data.counts || {});
     renderTable();
   })
-  .catch(() => {
+  .catch(function() {
     $('refreshBtn').classList.remove('spin');
-    toast('Error de conexión');
+    toast('Error de conexion');
   });
 }
 
@@ -347,10 +348,12 @@ function updateCounts(c) {
 // ---------- FILTERS ----------
 function setFilter(filter) {
   currentFilter = filter;
-  document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
-  const activeCard = document.querySelector('.card[data-filter="' + filter + '"]');
+  document.querySelectorAll('.card').forEach(function(card) {
+    card.classList.remove('active');
+  });
+  var activeCard = document.querySelector('.card[data-filter="' + filter + '"]');
   if (activeCard) activeCard.classList.add('active');
-  const titles = {
+  var titles = {
     all: 'Todas las comandas',
     new: 'Comandas nuevas',
     inKitchen: 'En cocina',
@@ -365,12 +368,12 @@ function setFilter(filter) {
 
 // ---------- TABLE ----------
 function renderTable() {
-  const tbody = $('ordersTable');
+  var tbody = $('ordersTable');
   tbody.innerHTML = '';
 
-  let filtered = orders;
+  var filtered = orders;
   if (currentFilter !== 'all') {
-    filtered = orders.filter(o => {
+    filtered = orders.filter(function(o) {
       if (currentFilter === 'new') return o.orderStatus === 'NEW';
       if (currentFilter === 'inKitchen') return o.orderStatus === 'IN_KITCHEN';
       if (currentFilter === 'delivered') return o.orderStatus === 'DELIVERED';
@@ -384,64 +387,66 @@ function renderTable() {
   $('tableCount').textContent = filtered.length + ' comanda' + (filtered.length !== 1 ? 's' : '');
   $('emptyState').classList.toggle('hidden', filtered.length > 0);
 
-  filtered.forEach(o => {
-    const tr = document.createElement('tr');
-    const statusClass = 'status-' + (o.orderStatus || 'NEW').toLowerCase().replace(/_/g,'');
-    const pickupClass = 'status-' + (o.pickupStatus || 'NOT_REQUIRED').toLowerCase().replace(/_/g,'');
-    const deliveryType = o.deliveries && o.deliveries[0] ? o.deliveries[0].deliveryType : '';
+  filtered.forEach(function(o) {
+    var tr = document.createElement('tr');
+    var statusClass = 'status-' + (o.orderStatus || 'NEW').toLowerCase().replace(/_/g, '');
+    var pickupClass = 'status-' + (o.pickupStatus || 'NOT_REQUIRED').toLowerCase().replace(/_/g, '');
+    var deliveryType = o.deliveries && o.deliveries[0] ? o.deliveries[0].deliveryType : '';
 
-    tr.innerHTML = `
-      <td><b>${o.orderId.slice(0,12)}...</b></td>
-      <td><b>${escapeHtml(o.room || '')}</b></td>
-      <td>${escapeHtml(o.guest || '')}</td>
-      <td>${escapeHtml(DELIVERY_LABELS[deliveryType] || o.service || '')}</td>
-      <td><span class="status-badge ${statusClass}">${STATUS_LABELS[o.orderStatus] || o.orderStatus}</span></td>
-      <td><span class="status-badge ${pickupClass}">${PICKUP_LABELS[o.pickupStatus] || o.pickupStatus}</span></td>
-      <td><div class="actions">${buildActions(o)}</div></td>
-    `;
+    tr.innerHTML = '<td><b>' + o.orderId.slice(0, 12) + '...</b></td>' +
+      '<td><b>' + escapeHtml(o.room || '') + '</b></td>' +
+      '<td>' + escapeHtml(o.guest || '') + '</td>' +
+      '<td>' + escapeHtml(DELIVERY_LABELS[deliveryType] || o.service || '') + '</td>' +
+      '<td><span class="status-badge ' + statusClass + '">' + (STATUS_LABELS[o.orderStatus] || o.orderStatus) + '</span></td>' +
+      '<td><span class="status-badge ' + pickupClass + '">' + (PICKUP_LABELS[o.pickupStatus] || o.pickupStatus) + '</span></td>' +
+      '<td><div class="actions">' + buildActions(o) + '</div></td>';
     tbody.appendChild(tr);
   });
 }
 
 function buildActions(o) {
-  let html = '';
-  const orderId = o.orderId;
+  var html = '';
+  var orderId = o.orderId;
 
   if (o.orderStatus === 'NEW') {
-    html += `<button class="action-btn btn-cook" onclick="actionPost('startCooking','${orderId}')">👨‍🍳 Cocina</button>`;
+    html += '<button class="action-btn btn-cook" onclick="actionPost(\'startCooking\',\'' + orderId + '\')">&#x1F468;&#x200D;&#x1F373; Cocina</button>';
   }
   if (o.orderStatus === 'IN_KITCHEN' && o.deliveryStatus === 'NOT_SELECTED') {
-    html += `<button class="action-btn btn-delivery" onclick="openDeliveryModal('${orderId}')">🛒 Entrega</button>`;
+    html += '<button class="action-btn btn-delivery" onclick="openDeliveryModal(\'' + orderId + '\')">&#x1F6D2; Entrega</button>';
   }
   if (o.orderStatus === 'IN_KITCHEN' && o.deliveryStatus === 'SELECTED') {
-    html += `<button class="action-btn btn-done" onclick="actionPost('markDelivered','${orderId}')">✅ Entregado</button>`;
+    html += '<button class="action-btn btn-done" onclick="actionPost(\'markDelivered\',\'' + orderId + '\')">&#x2705; Entregado</button>';
   }
   if (o.orderStatus === 'DELIVERED' && o.pickupStatus === 'PENDING') {
-    html += `<button class="action-btn btn-collect" onclick="actionPost('completeDeliveryPickup','${o.deliveries[0].deliveryId}')">✅ Recogido</button>`;
+    html += '<button class="action-btn btn-collect" onclick="actionPost(\'completeDeliveryPickup\',\'' + (o.deliveries[0] && o.deliveries[0].deliveryId) + '\')">&#x2705; Recogido</button>';
   }
   if (o.orderStatus === 'DELIVERED' && o.pickupStatus === 'REQUESTED') {
-    const pickup = o.pickups && o.pickups[0];
+    var pickup = o.pickups && o.pickups[0];
     if (pickup) {
-      html += `<button class="action-btn btn-pickup-way" onclick="actionPost('pickupOnWay','${pickup.pickupId}')">🚶 En camino</button>`;
-      html += `<button class="action-btn btn-pickup-done" onclick="actionPost('completePickup','${pickup.pickupId}')">✅ Recogido</button>`;
+      html += '<button class="action-btn btn-pickup-way" onclick="actionPost(\'pickupOnWay\',\'' + pickup.pickupId + '\')">&#x1F6B6; En camino</button>';
+      html += '<button class="action-btn btn-pickup-done" onclick="actionPost(\'completePickup\',\'' + pickup.pickupId + '\')">&#x2705; Recogido</button>';
     }
   }
   if (o.orderStatus === 'DELIVERED' && o.pickupStatus === 'ON_THE_WAY') {
-    const pickup = o.pickups && o.pickups[0];
-    if (pickup) {
-      html += `<button class="action-btn btn-pickup-done" onclick="actionPost('completePickup','${pickup.pickupId}')">✅ Recogido</button>`;
+    var pickup2 = o.pickups && o.pickups[0];
+    if (pickup2) {
+      html += '<button class="action-btn btn-pickup-done" onclick="actionPost(\'completePickup\',\'' + pickup2.pickupId + '\')">&#x2705; Recogido</button>';
     }
   }
-  html += `<button class="action-btn" style="background:#f0f0f0;color:#555" onclick="openDetailModal('${orderId}')">👁️ Ver</button>`;
+  html += '<button class="action-btn" style="background:#f0f0f0;color:#555" onclick="openDetailModal(\'' + orderId + '\')">&#x1F441; Ver</button>';
   return html;
 }
 
 // ---------- ACTIONS ----------
 function actionPost(action, id) {
-  const payload = { action, sessionToken };
+  var payload = { action: action, sessionToken: sessionToken };
   if (action === 'startCooking') payload.orderId = id;
   if (action === 'markDelivered') payload.orderId = id;
-  if (action === 'selectDeliveryType') { payload.orderId = id; payload.deliveryType = window._selectedDeliveryType; payload.materialDetails = ''; }
+  if (action === 'selectDeliveryType') {
+    payload.orderId = id;
+    payload.deliveryType = window._selectedDeliveryType;
+    payload.materialDetails = '';
+  }
   if (action === 'pickupOnWay') payload.pickupId = id;
   if (action === 'completePickup') payload.pickupId = id;
   if (action === 'completeDeliveryPickup') payload.deliveryId = id;
@@ -451,14 +456,14 @@ function actionPost(action, id) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
-  .then(r => r.json())
-  .then(data => {
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
     if (!data.ok) return toast(data.error || 'Error');
-    toast('✓ Acción completada');
+    toast('&#x2713; Accion completada');
     closeModal();
     loadDashboard();
   })
-  .catch(() => toast('Error de conexión'));
+  .catch(function() { toast('Error de conexion'); });
 }
 
 // ---------- DELIVERY MODAL ----------
@@ -466,35 +471,27 @@ function openDeliveryModal(orderId) {
   window._selectedDeliveryType = '';
   window._currentOrderId = orderId;
   $('modalTitle').textContent = 'Seleccionar tipo de entrega';
-  $('modalBody').innerHTML = `
-    <div class="delivery-types">
-      <button class="delivery-type-btn" onclick="selectDeliveryType('TABLE_TROLLEY')">🛒 Mesa / trolley</button>
-      <button class="delivery-type-btn" onclick="selectDeliveryType('TRAY')">🍽️ Bandeja</button>
-      <button class="delivery-type-btn" onclick="selectDeliveryType('DRINKS_ONLY')">🥤 Solo bebida</button>
-      <button class="delivery-type-btn" onclick="selectDeliveryType('DRINKS_GLASSWARE')">🥂 Bebidas/cristalería</button>
-      <button class="delivery-type-btn" onclick="selectDeliveryType('CROCKERY')">🍴 Vajilla</button>
-      <button class="delivery-type-btn" onclick="selectDeliveryType('OTHER')">📦 Otro</button>
-    </div>
-    <div class="modal__actions">
-      <button class="login-btn" onclick="confirmDeliveryType()">Confirmar</button>
-    </div>
-  `;
+  $('modalBody').innerHTML =
+    '<div class="delivery-types">' +
+    '<button class="delivery-type-btn" onclick="selectDT(\'TABLE_TROLLEY\',this)">&#x1F6D2; Mesa / trolley</button>' +
+    '<button class="delivery-type-btn" onclick="selectDT(\'TRAY\',this)">&#x1F37D; Bandeja</button>' +
+    '<button class="delivery-type-btn" onclick="selectDT(\'DRINKS_ONLY\',this)">&#x1F964; Solo bebida</button>' +
+    '<button class="delivery-type-btn" onclick="selectDT(\'DRINKS_GLASSWARE\',this)">&#x1F942; Bebidas/cristaleria</button>' +
+    '<button class="delivery-type-btn" onclick="selectDT(\'CROCKERY\',this)">&#x1F374; Vajilla</button>' +
+    '<button class="delivery-type-btn" onclick="selectDT(\'OTHER\',this)">&#x1F4E6; Otro</button>' +
+    '</div>' +
+    '<div class="modal__actions"><button class="login-btn" onclick="confirmDeliveryType()">Confirmar</button></div>';
   $('modalOverlay').classList.add('open');
 }
 
-function selectDeliveryType(type) {
+function selectDT(type, btn) {
   window._selectedDeliveryType = type;
-  document.querySelectorAll('.delivery-type-btn').forEach(b => {
-    b.style.borderColor = b.textContent.includes(type === 'TABLE_TROLLEY' ? 'Mesa' : type === 'TRAY' ? 'Bandeja' : type === 'DRINKS_ONLY' ? 'Solo bebida' : type === 'DRINKS_GLASSWARE' ? 'Bebidas' : type === 'CROCKERY' ? 'Vajilla' : 'Otro') ? 'var(--yellow)' : 'var(--line)';
-    b.style.background = b.dataset.type === type ? 'var(--yellow-soft)' : '#fff';
-  });
-  // Simpler approach:
-  document.querySelectorAll('.delivery-type-btn').forEach(b => {
+  document.querySelectorAll('.delivery-type-btn').forEach(function(b) {
     b.style.borderColor = 'var(--line)';
     b.style.background = '#fff';
   });
-  event.target.style.borderColor = 'var(--yellow)';
-  event.target.style.background = 'var(--yellow-soft)';
+  btn.style.borderColor = 'var(--yellow)';
+  btn.style.background = 'var(--yellow-soft)';
 }
 
 function confirmDeliveryType() {
@@ -504,31 +501,35 @@ function confirmDeliveryType() {
 
 // ---------- DETAIL MODAL ----------
 function openDetailModal(orderId) {
-  const o = orders.find(x => x.orderId === orderId);
+  var o = orders.find(function(x) { return x.orderId === orderId; });
   if (!o) return;
-  const items = (o.items || []).map(it => `• ${it.quantity || it.qty || 0} × ${it.nameEs || it.name || it.nameEn || ''} ${it.variantEs || it.variant || ''} — ${(it.subtotal || it.total || 0).toFixed(2).replace('.',',')} €`).join('<br>');
-  const delivery = o.deliveries && o.deliveries[0];
-  const pickup = o.pickups && o.pickups[0];
+  var items = (o.items || []).map(function(it) {
+    return '&#x2022; ' + (it.quantity || it.qty || 0) + ' &#xD7; ' +
+      (it.nameEs || it.name || it.nameEn || '') + ' ' +
+      (it.variantEs || it.variant || '') + ' &#x2014; ' +
+      (it.subtotal || it.total || 0).toFixed(2).replace('.', ',') + ' &#x20AC;';
+  }).join('<br>');
+  var delivery = o.deliveries && o.deliveries[0];
+  var pickup = o.pickups && o.pickups[0];
 
   $('modalTitle').textContent = 'Detalle de comanda';
-  $('modalBody').innerHTML = `
-    <div class="modal__row"><span>ID</span><span>${o.orderId}</span></div>
-    <div class="modal__row"><span>Habitación</span><span>${escapeHtml(o.room || '')}</span></div>
-    <div class="modal__row"><span>Huésped</span><span>${escapeHtml(o.guest || '')}</span></div>
-    <div class="modal__row"><span>Servicio</span><span>${escapeHtml(o.service || '')}</span></div>
-    <div class="modal__row"><span>Estado pedido</span><span>${STATUS_LABELS[o.orderStatus] || o.orderStatus}</span></div>
-    <div class="modal__row"><span>Estado recogida</span><span>${PICKUP_LABELS[o.pickupStatus] || o.pickupStatus}</span></div>
-    <div class="modal__row"><span>Tipo entrega</span><span>${escapeHtml(DELIVERY_LABELS[delivery && delivery.deliveryType] || '—')}</span></div>
-    <div class="modal__row"><span>Total</span><span>${Number(o.total || 0).toFixed(2).replace('.',',')} €</span></div>
-    <div class="modal__row"><span>Notas</span><span>${escapeHtml(o.notes || '—')}</span></div>
-    <div class="modal__row"><span>Artículos</span><span>${items || '—'}</span></div>
-    ${pickup ? `<div class="modal__row"><span>Ubicación recogida</span><span>${escapeHtml(pickup.location || '—')}</span></div>` : ''}
-    ${pickup && pickup.guestName ? `<div class="modal__row"><span>Solicitado por</span><span>${escapeHtml(pickup.guestName)}</span></div>` : ''}
-    ${pickup && pickup.guestNotes ? `<div class="modal__row"><span>Notas recogida</span><span>${escapeHtml(pickup.guestNotes)}</span></div>` : ''}
-    ${pickup && pickup.rating ? `<div class="modal__row"><span>Valoración</span><span>⭐ ${pickup.rating}/5</span></div>` : ''}
-    ${pickup && pickup.feedback ? `<div class="modal__row"><span>Feedback</span><span>${escapeHtml(pickup.feedback)}</span></div>` : ''}
-    <div class="modal__actions">${buildActions(o)}</div>
-  `;
+  $('modalBody').innerHTML =
+    '<div class="modal__row"><span>ID</span><span>' + o.orderId + '</span></div>' +
+    '<div class="modal__row"><span>Habitacion</span><span>' + escapeHtml(o.room || '') + '</span></div>' +
+    '<div class="modal__row"><span>Huesped</span><span>' + escapeHtml(o.guest || '') + '</span></div>' +
+    '<div class="modal__row"><span>Servicio</span><span>' + escapeHtml(o.service || '') + '</span></div>' +
+    '<div class="modal__row"><span>Estado pedido</span><span>' + (STATUS_LABELS[o.orderStatus] || o.orderStatus) + '</span></div>' +
+    '<div class="modal__row"><span>Estado recogida</span><span>' + (PICKUP_LABELS[o.pickupStatus] || o.pickupStatus) + '</span></div>' +
+    '<div class="modal__row"><span>Tipo entrega</span><span>' + escapeHtml(DELIVERY_LABELS[delivery && delivery.deliveryType] || '&#x2014;') + '</span></div>' +
+    '<div class="modal__row"><span>Total</span><span>' + Number(o.total || 0).toFixed(2).replace('.', ',') + ' &#x20AC;</span></div>' +
+    '<div class="modal__row"><span>Notas</span><span>' + escapeHtml(o.notes || '&#x2014;') + '</span></div>' +
+    '<div class="modal__row"><span>Articulos</span><span>' + (items || '&#x2014;') + '</span></div>' +
+    (pickup ? '<div class="modal__row"><span>Ubicacion recogida</span><span>' + escapeHtml(pickup.location || '&#x2014;') + '</span></div>' : '') +
+    (pickup && pickup.guestName ? '<div class="modal__row"><span>Solicitado por</span><span>' + escapeHtml(pickup.guestName) + '</span></div>' : '') +
+    (pickup && pickup.guestNotes ? '<div class="modal__row"><span>Notas recogida</span><span>' + escapeHtml(pickup.guestNotes) + '</span></div>' : '') +
+    (pickup && pickup.rating ? '<div class="modal__row"><span>Valoracion</span><span>&#x2B50; ' + pickup.rating + '/5</span></div>' : '') +
+    (pickup && pickup.feedback ? '<div class="modal__row"><span>Feedback</span><span>' + escapeHtml(pickup.feedback) + '</span></div>' : '') +
+    '<div class="modal__actions">' + buildActions(o) + '</div>';
   $('modalOverlay').classList.add('open');
 }
 
@@ -537,26 +538,34 @@ function closeModal() {
 }
 
 // ---------- UTILS ----------
-function $(id) { return document.getElementById(id); }
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+function $(id) {
+  return document.getElementById(id);
 }
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c];
+  });
+}
+
 function toast(msg) {
-  const t = $('toast');
+  var t = $('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(function() {
+    t.classList.remove('show');
+  }, 3000);
 }
 
 // Auto-refresh cada 10 segundos
-autoRefresh = setInterval(() => {
+autoRefresh = setInterval(function() {
   if (sessionToken && !$('modalOverlay').classList.contains('open')) {
     loadDashboard();
   }
 }, 10000);
 
 // Keyboard shortcuts
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
 </script>
