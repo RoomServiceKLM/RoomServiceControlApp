@@ -168,7 +168,67 @@ const STATUS_LABELS={NEW:'Nueva',IN_KITCHEN:'En cocina',READY:'Lista',DELIVERED:
 const PICKUP_LABELS={NOT_REQUIRED:'No aplica',PENDING:'Pendiente',REQUESTED:'Solicitada',ON_THE_WAY:'En camino',COMPLETED:'Completada'};
 const DELIVERY_LABELS={TABLE_TROLLEY:'Mesa/trolley',TRAY:'Bandeja',DRINKS_ONLY:'Solo bebida',DRINKS_GLASSWARE:'Bebidas/cristaleria',CROCKERY:'Vajilla',OTHER:'Otro'};
 if(sessionToken&&user){showApp();loadDashboard()}
-function doLogin(){var select=$('loginUser'),userId=select.value,pass=select.options[select.selectedIndex].dataset.pass||'';if(!userId)return showLoginError('Selecciona un usuario del panel.');$('loginBtn').disabled=!0,$('loginError').classList.add('hidden'),fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',userId:userId,password:pass})}).then(function(r){return r.json().then(function(data){return{status:r.status,data:data}})}).then(function(res){if($('loginBtn').disabled=!1,console.log('Login response:',res),!res.data.ok){var err=res.data.error||'Error desconocido';return res.status===401&&(err='Usuario o contraseña incorrectos.'),res.status===403&&(err='Acceso denegado.'),res.status===500&&(err='Error del servidor.'),showLoginError('Error ('+res.status+'): '+err)}sessionToken=res.data.sessionToken,user=res.data.user,localStorage.setItem('rs_sessionToken',sessionToken),localStorage.setItem('rs_user',JSON.stringify(user)),showApp(),loadDashboard()}).catch(function(err){$('loginBtn').disabled=!1,console.error('Login fetch error:',err),showLoginError('Error de conexion. Comprueba tu internet.')})}
+function doLogin() {
+  var select = $('loginUser');
+  var userId = select.value;
+  var pass = select.options[select.selectedIndex].dataset.pass || '';
+  
+  if (!userId) return showLoginError('Selecciona un usuario.');
+  
+  $('loginBtn').disabled = true;
+  $('loginError').classList.add('hidden');
+  
+  fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'login', userId: userId, password: pass })
+  })
+  .then(function(r) {
+    return r.text().then(function(text) {
+      return { status: r.status, text: text };
+    });
+  })
+  .then(function(res) {
+    $('loginBtn').disabled = false;
+    
+    // DEBUG: muestra la respuesta cruda
+    $('loginError').textContent = 'DEBUG - HTTP ' + res.status + ':\n' + res.text.slice(0, 500);
+    $('loginError').classList.remove('hidden');
+    $('loginError').style.background = '#e8f0fe';
+    $('loginError').style.color = '#1e5aa8';
+    $('loginError').style.borderColor = '#1e5aa8';
+    
+    try {
+      var data = JSON.parse(res.text);
+      
+      // Si hay sessionToken, intentar entrar
+      if (data.sessionToken) {
+        sessionToken = data.sessionToken;
+        user = data.user || { displayName: userId };
+        localStorage.setItem('rs_sessionToken', sessionToken);
+        localStorage.setItem('rs_user', JSON.stringify(user));
+        showApp();
+        loadDashboard();
+        return;
+      }
+      
+      // Si no hay sessionToken pero hay error
+      if (data.error) {
+        $('loginError').style.background = '';
+        $('loginError').style.color = '';
+        $('loginError').style.borderColor = '';
+        showLoginError('Error: ' + data.error);
+      }
+      
+    } catch(e) {
+      showLoginError('Respuesta no es JSON valido:\n' + res.text.slice(0, 300));
+    }
+  })
+  .catch(function(err) {
+    $('loginBtn').disabled = false;
+    showLoginError('Error de red: ' + String(err));
+  });
+}
 function doLogout(){sessionToken&&fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout',sessionToken:sessionToken})}).catch(function(){}),sessionToken='',user=null,localStorage.removeItem('rs_sessionToken'),localStorage.removeItem('rs_user'),location.reload()}
 function showLoginError(msg){$('loginError').textContent=msg,$('loginError').classList.remove('hidden')}
 function showApp(){$('loginScreen').classList.add('hidden'),$('appScreen').style.display='block',$('userDisplay').textContent=(user&&user.displayName)||''}
