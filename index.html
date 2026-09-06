@@ -12,7 +12,7 @@
 <style>
 :root{--black:#111;--ink:#111;--muted:#777;--yellow:#F8AC00;--yellow-dark:#D18F00;--yellow-soft:#FFF7E1;--paper:#fff;--bg:#F3F3F3;--soft:#F7F7F7;--line:#D8D8D8;--danger:#B42318;--danger-soft:#FFF0ED;--ok:#17633A;--blue:#1E5AA8;--blue-soft:#E8F0FE;--shadow:0 8px 24px rgba(111,70,0,.08)}
 *{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Jost,Arial,sans-serif;overflow-x:hidden}
-button,input{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sans",Arial,sans-serif;margin:0}
+button,input,select{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sans",Arial,sans-serif;margin:0}
 .login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(150deg,#f8edcf,var(--yellow-soft))}
 .login-card{width:min(400px,100%);background:var(--paper);border-radius:20px;box-shadow:var(--shadow);padding:36px 28px;text-align:center}
 .login-card img{height:42px;margin-bottom:18px}
@@ -20,13 +20,12 @@ button,input{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sa
 .login-card p{color:var(--muted);font-size:13px;margin-bottom:24px}
 .login-field{margin-bottom:16px;text-align:left}
 .login-field label{display:block;font-size:11px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;margin-bottom:6px}
-.login-field input{width:100%;border:1.5px solid #E2C879;border-radius:10px;padding:12px 14px;outline:none;font-size:14px;transition:.15s}
-.login-field input:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(248,172,0,.2)}
+.login-field select{width:100%;border:1.5px solid #E2C879;border-radius:10px;padding:12px 14px;outline:none;font-size:14px;transition:.15s;background:#fff;cursor:pointer}
+.login-field select:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(248,172,0,.2)}
 .login-btn{width:100%;border:0;border-radius:12px;padding:14px;background:var(--yellow);color:#111;font-family:"Josefin Sans";font-size:14px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 18px rgba(209,143,0,.22);transition:.2s;margin-top:4px}
 .login-btn:hover{background:var(--yellow-dark)}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
 .login-error{background:var(--danger-soft);color:var(--danger);border:1px solid #F2B8B0;border-radius:10px;padding:11px 14px;font-size:13px;font-weight:600;margin-top:14px;text-align:left;white-space:pre-line}
-.login-info{background:var(--yellow-soft);color:#654b08;border:1px solid #E2C879;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;margin-top:10px;text-align:left}
 .hidden{display:none!important}
 .app{display:none}
 .topbar{background:var(--black);border-bottom:3px solid var(--yellow);position:sticky;top:0;z-index:100}
@@ -109,16 +108,22 @@ tbody tr:hover{background:#fafafa}
     <h1>Room Service</h1>
     <p>Panel de control interno</p>
     <div class="login-field">
-      <label>Usuario</label>
-      <input id="loginUser" placeholder="Ej: USR-MARLEN" autocomplete="off">
-    </div>
-    <div class="login-field">
-      <label>Contraseña (apellido)</label>
-      <input id="loginPass" type="password" placeholder="Tu apellido">
+      <label>Selecciona tu usuario</label>
+      <select id="loginUser">
+        <option value="" disabled selected>-- Elige tu nombre --</option>
+        <option value="USR-MARLEN" data-pass="Andrade">Marlen Andrade (Admin)</option>
+        <option value="USR-SANDRA" data-pass="Rivera">Sandra Rivera</option>
+        <option value="USR-HELENA" data-pass="Carrasco">Helena Carrasco</option>
+        <option value="USR-GONZALO" data-pass="Bueno">Gonzalo Bueno</option>
+        <option value="USR-GUSTAVO" data-pass="Vidales">Gustavo Vidales</option>
+        <option value="USR-ALEJANDRO" data-pass="Rodriguez">Alejandro Rodriguez</option>
+        <option value="USR-RAFA" data-pass="Moreno">Rafael Moreno</option>
+        <option value="USR-IGNACIO" data-pass="Aparicio">Ignacio Aparicio (Supervisor)</option>
+        <option value="USR-IVAN" data-pass="Zambrano">Ivan Zambrano</option>
+      </select>
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Entrar</button>
     <div id="loginError" class="login-error hidden"></div>
-    <div class="login-info">Usuarios: USR-MARLEN, USR-SANDRA, USR-HELENA, USR-GONZALO, USR-GUSTAVO, USR-ALEJANDRO, USR-RAFA, USR-IGNACIO, USR-IVAN. Contraseña = apellido.</div>
   </div>
 </div>
 
@@ -242,9 +247,12 @@ if (sessionToken && user) {
 }
 
 function doLogin() {
-  const userId = $('loginUser').value.trim();
-  const pass = $('loginPass').value.trim();
-  if (!userId || !pass) return showLoginError('Introduce usuario y contraseña.');
+  var select = $('loginUser');
+  var userId = select.value;
+  var pass = select.options[select.selectedIndex].dataset.pass || '';
+  
+  if (!userId) return showLoginError('Selecciona un usuario del panel.');
+  
   $('loginBtn').disabled = true;
   
   fetch(API, {
@@ -279,7 +287,7 @@ function doLogin() {
   .catch(function(err) {
     $('loginBtn').disabled = false;
     console.error('Login fetch error:', err);
-    showLoginError('Error de conexion. Comprueba tu internet.\n\nSi usas iPhone, prueba con WiFi.');
+    showLoginError('Error de conexion. Comprueba tu internet.');
   });
 }
 
