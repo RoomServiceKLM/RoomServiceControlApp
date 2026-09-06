@@ -1,11 +1,1 @@
-{
-  "name": "Room Service Control",
-  "short_name": "RS Control",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#111111",
-  "icons": [
-    { "src": "logo.svg", "sizes": "any", "type": "image/svg+xml" }
-  ]
-}
+{"name":"Room Service Control","short_name":"RS Control","start_url":".","display":"standalone","background_color":"#111111","theme_color":"#111111","icons":[{"src":"logo.svg","sizes":"any","type":"image/svg+xml"}]}
