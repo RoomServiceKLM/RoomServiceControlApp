@@ -167,11 +167,33 @@ dialog{border:0;border-radius:20px;padding:0;width:min(520px,calc(100% - 22px));
 <div id="toast" class="toast"></div>
 
 <script>
-const API = 'https://roomservice-operations-api.roomservicekimptonlosmonteros.workers.dev/';
+// Pega aquí la URL de la implementación de Apps Script terminada en /exec.
+// No uses la URL del editor ni la antigua URL de Cloudflare.
+const API = 'PEGA_AQUI_LA_URL_DE_APPS_SCRIPT_EXEC';
 let staff = '';
 let orders = [];
 let currentStatus = 'all';
 let installPrompt = null;
+
+function apiReady() {
+  return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(API);
+}
+
+async function apiPost(payload) {
+  if (!apiReady()) throw new Error('Falta configurar la URL /exec de Apps Script en la constante API.');
+  const response = await fetch(API, {
+    method: 'POST',
+    redirect: 'follow',
+    // text/plain evita el preflight CORS que bloquea Apps Script desde GitHub Pages/PWA.
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  const text = await response.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch (error) { throw new Error('Apps Script devolvió una respuesta no válida. Revisa que la implementación permita acceso a cualquiera.'); }
+  return data;
+}
 
 // ---------- PWA INSTALL ----------
 window.addEventListener('beforeinstallprompt', function(e) {
@@ -226,21 +248,11 @@ async function loadData() {
   document.getElementById('content').textContent = 'Cargando...';
   try {
     // Intentar health primero para ver si el backend responde
-    const healthRes = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'health' })
-    });
-    const healthData = await healthRes.json();
+    const healthData = await apiPost({ action: 'health' });
     console.log('Health:', healthData);
 
     // Luego intentar dashboard
-    const res = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'dashboard', sessionToken: 'DUMMY' })
-    });
-    const data = await res.json();
+    const data = await apiPost({ action: 'dashboard', sessionToken: 'DUMMY', staffName: staff });
     console.log('Dashboard:', data);
     
     if (!data.ok) {
@@ -341,12 +353,7 @@ function setStatus(btn) {
 // ---------- ACTIONS ----------
 async function act(action, id) {
   try {
-    var res = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: action, sessionToken: 'DUMMY', orderId: id, pickupId: id, staffName: staff })
-    });
-    var data = await res.json();
+    var data = await apiPost({ action: action, sessionToken: 'DUMMY', orderId: id, pickupId: id, staffName: staff });
     if (!data.ok) throw new Error(data.error || 'Error');
     toast('Accion completada');
     loadData();
@@ -374,22 +381,15 @@ async function submitService(e) {
   
   try {
     var payload = {
-      action: 'createGuestPickupRequest',
+      action: 'createManualService',
+      sessionToken: 'DUMMY',
+      staffName: staff,
       room: room,
-      guestName: staff,
       deliveryType: type,
-      location: 'INSIDE_ROOM',
-      guestNotes: notes,
-      rating: '',
-      feedback: ''
+      notes: notes
     };
     
-    var res = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    var data = await res.json();
+    var data = await apiPost(payload);
     console.log('Service response:', data);
     
     if (!data.ok) throw new Error(data.error || 'Error al registrar');
@@ -414,6 +414,14 @@ function toast(msg, error) {
   el.textContent = msg;
   el.className = 'toast show' + (error ? ' error' : '');
   setTimeout(function() { el.className = 'toast'; }, 3500);
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').catch(function(error) {
+      console.warn('No se pudo registrar el service worker:', error);
+    });
+  });
 }
 </script>
 </body>
