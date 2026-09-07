@@ -80,6 +80,7 @@ dialog{border:0;border-radius:20px;padding:0;width:min(520px,calc(100% - 22px));
 .login-box p{color:var(--muted);font-size:14px}
 .login-box input,.login-box select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;margin:13px 0 16px;font-size:14px;background:#fff}
 .hidden{display:none!important}
+#installBtn[hidden]{display:none}
 @media(max-width:720px){.toolbar{grid-template-columns:1fr}.actions{flex-wrap:wrap}.top{padding-bottom:25px}.main{padding-inline:11px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -96,8 +97,9 @@ dialog{border:0;border-radius:20px;padding:0;width:min(520px,calc(100% - 22px));
     </div>
     <h1>Room Service Control</h1>
     <div class="actions">
-      <button class="btn btn-primary" onclick="openNewOrder()">+ Nueva comanda</button>
+      <button class="btn btn-primary" onclick="openServiceModal()">+ Registrar servicio</button>
       <button class="btn btn-light" onclick="loadData()">&#x21bb; Actualizar</button>
+      <button class="btn btn-light" id="installBtn" hidden onclick="installApp()">&#x2193; Instalar app</button>
     </div>
   </header>
   <main class="main">
@@ -138,28 +140,26 @@ dialog{border:0;border-radius:20px;padding:0;width:min(520px,calc(100% - 22px));
   </div>
 </dialog>
 
-<dialog id="orderModal">
-  <form id="orderForm" class="form" onsubmit="submitOrder(event)">
+<dialog id="serviceModal">
+  <form id="serviceForm" class="form" onsubmit="submitService(event)">
     <div class="modal-head">
-      <h2 id="modalTitle">Nueva comanda</h2>
-      <button type="button" class="close" onclick="document.getElementById('orderModal').close()">&times;</button>
+      <h2>Registrar servicio</h2>
+      <button type="button" class="close" onclick="document.getElementById('serviceModal').close()">&times;</button>
     </div>
     <div class="form">
-      <div class="field"><label>Habitacion</label><input id="f_room" inputmode="numeric" placeholder="ej. 215" required></div>
-      <div class="field"><label>Huesped</label><input id="f_guest" placeholder="Nombre y apellido" required></div>
-      <div class="field"><label>Servicio</label>
-        <select id="f_service" required>
-          <option value="Desayuno">Desayuno</option>
-          <option value="Comida">Comida</option>
-          <option value="Cena">Cena</option>
-          <option value="Room Service">Room Service</option>
+      <div class="field"><label>Habitacion</label><input id="s_room" inputmode="numeric" placeholder="ej. 215" required></div>
+      <div class="field"><label>Tipo de servicio</label>
+        <select id="s_type" required>
+          <option value="TRAY">Bandeja (con recogida)</option>
+          <option value="TABLE_TROLLEY">Carro / Mesa (con recogida)</option>
+          <option value="DRINKS_ONLY">Solo bebidas (sin recogida)</option>
         </select>
       </div>
-      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Alergias, preferencias..."></textarea></div>
+      <div class="field"><label>Notas</label><textarea id="s_notes" placeholder="Alergias, preferencias, hora..."></textarea></div>
     </div>
     <div class="modal-foot">
-      <button type="button" class="btn btn-light" onclick="document.getElementById('orderModal').close()">Cancelar</button>
-      <button type="submit" class="btn btn-wine">Crear comanda</button>
+      <button type="button" class="btn btn-light" onclick="document.getElementById('serviceModal').close()">Cancelar</button>
+      <button type="submit" class="btn btn-wine">Registrar</button>
     </div>
   </form>
 </dialog>
@@ -171,22 +171,24 @@ const API = 'https://roomservice-operations-api.roomservicekimptonlosmonteros.wo
 let staff = '';
 let orders = [];
 let currentStatus = 'all';
+let installPrompt = null;
 
-const STATUS_LABELS = {
-  NEW: 'Nueva',
-  IN_KITCHEN: 'En cocina',
-  READY: 'Lista',
-  DELIVERED: 'Entregada',
-  CANCELLED: 'Cancelada',
-  DELETED: 'Eliminada'
-};
-const PICKUP_LABELS = {
-  NOT_REQUIRED: 'No aplica',
-  PENDING: 'Pendiente',
-  REQUESTED: 'Solicitada',
-  ON_THE_WAY: 'En camino',
-  COMPLETED: 'Completada'
-};
+// ---------- PWA INSTALL ----------
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  installPrompt = e;
+  document.getElementById('installBtn').hidden = false;
+});
+function installApp() {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  installPrompt = null;
+  document.getElementById('installBtn').hidden = true;
+}
+window.addEventListener('appinstalled', function() {
+  document.getElementById('installBtn').hidden = true;
+  toast('App instalada');
+});
 
 // ---------- AUTH ----------
 function doLogin() {
@@ -199,7 +201,6 @@ function doLogin() {
   document.getElementById('loginError').classList.add('hidden');
   startSession(name);
 }
-
 function startSession(name) {
   staff = name;
   localStorage.setItem('rs_staffName', staff);
@@ -208,7 +209,6 @@ function startSession(name) {
   if (document.getElementById('loginModal').open) document.getElementById('loginModal').close();
   loadData();
 }
-
 function doLogout() {
   localStorage.removeItem('rs_staffName');
   staff = '';
@@ -216,40 +216,55 @@ function doLogout() {
   document.getElementById('staffInput').value = '';
   document.getElementById('loginModal').showModal();
 }
-
-const saved = localStorage.getItem('rs_staffName');
-if (saved) {
-  startSession(saved);
-} else {
-  document.getElementById('loginModal').showModal();
-}
+var saved = localStorage.getItem('rs_staffName');
+if (saved) startSession(saved);
+else document.getElementById('loginModal').showModal();
 
 // ---------- DATA ----------
 async function loadData() {
   document.getElementById('content').className = 'loader';
-  document.getElementById('content').textContent = 'Cargando comandas...';
+  document.getElementById('content').textContent = 'Cargando...';
   try {
+    // Intentar health primero para ver si el backend responde
+    const healthRes = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'health' })
+    });
+    const healthData = await healthRes.json();
+    console.log('Health:', healthData);
+
+    // Luego intentar dashboard
     const res = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'dashboard', sessionToken: 'DUMMY' })
     });
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Error del servidor');
+    console.log('Dashboard:', data);
+    
+    if (!data.ok) {
+      throw new Error(data.error || 'El backend no reconoce la accion "dashboard". Necesitas actualizar el Apps Script.');
+    }
     orders = data.orders || [];
     document.getElementById('updated').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
     render();
   } catch (err) {
     document.getElementById('content').className = 'empty';
-    document.getElementById('content').innerHTML = '<h3>No se pudieron cargar las comandas</h3><p>' + esc(err.message) + '</p>';
-    toast('Error: ' + err.message, true);
+    document.getElementById('content').innerHTML = 
+      '<h3>Error de conexion</h3>' +
+      '<p>' + esc(err.message) + '</p>' +
+      '<p style="font-size:12px;color:var(--muted);margin-top:10px">' +
+      'Si ves "action post no reconocida", el Apps Script necesita una funcion <b>dashboard</b>. ' +
+      'Pasa el codigo del nuevo Apps Script para arreglarlo.</p>';
+    toast(err.message, true);
   }
 }
 
 // ---------- RENDER ----------
 function render() {
-  const q = String(document.getElementById('search').value || '').toLowerCase().trim();
-  let list = orders;
+  var q = String(document.getElementById('search').value || '').toLowerCase().trim();
+  var list = orders;
   if (currentStatus === 'pickup') {
     list = orders.filter(function(o) {
       return o.pickupStatus && o.pickupStatus !== 'NOT_REQUIRED' && o.pickupStatus !== 'COMPLETED';
@@ -260,8 +275,7 @@ function render() {
   if (q) {
     list = list.filter(function(o) {
       return String(o.room || '').toLowerCase().includes(q) ||
-             String(o.guest || '').toLowerCase().includes(q) ||
-             String(o.orderId || '').toLowerCase().includes(q);
+             String(o.guest || '').toLowerCase().includes(q);
     });
   }
   document.getElementById('resultCount').textContent = list.length + ' comanda' + (list.length !== 1 ? 's' : '');
@@ -275,37 +289,39 @@ function render() {
 }
 
 function card(o) {
-  const status = STATUS_LABELS[o.orderStatus] || o.orderStatus;
-  const pickup = o.pickupStatus && o.pickupStatus !== 'NOT_REQUIRED' ? (' · ' + (PICKUP_LABELS[o.pickupStatus] || o.pickupStatus)) : '';
-  const time = o.createdAt ? new Date(o.createdAt).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}) : '';
-  let actions = '';
-  if (o.orderStatus === 'NEW') {
+  var status = o.orderStatus || 'NEW';
+  var pickup = o.pickupStatus && o.pickupStatus !== 'NOT_REQUIRED' ? (' · ' + o.pickupStatus) : '';
+  var time = o.createdAt ? new Date(o.createdAt).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}) : '';
+  var actions = '';
+  
+  if (status === 'NEW') {
     actions += '<button class="act-btn act-cook" onclick="act(\'startCooking\',\'' + o.orderId + '\')">Cocina</button>';
-  } else if (o.orderStatus === 'IN_KITCHEN') {
+  } else if (status === 'IN_KITCHEN') {
     actions += '<button class="act-btn act-delivery" onclick="act(\'selectDeliveryType\',\'' + o.orderId + '\')">Entrega</button>';
-  } else if (o.orderStatus === 'DELIVERED' && o.pickupStatus === 'REQUESTED') {
-    const pid = o.pickups && o.pickups[0] ? o.pickups[0].pickupId : '';
+  } else if (status === 'DELIVERED' && o.pickupStatus === 'REQUESTED') {
+    var pid = o.pickups && o.pickups[0] ? o.pickups[0].pickupId : '';
     actions += '<button class="act-btn act-way" onclick="act(\'pickupOnWay\',\'' + pid + '\')">En camino</button>';
     actions += '<button class="act-btn act-done" onclick="act(\'completePickup\',\'' + pid + '\')">Recogido</button>';
-  } else if (o.orderStatus === 'DELIVERED' && o.pickupStatus === 'ON_THE_WAY') {
-    const pid = o.pickups && o.pickups[0] ? o.pickups[0].pickupId : '';
-    actions += '<button class="act-btn act-done" onclick="act(\'completePickup\',\'' + pid + '\')">Recogido</button>';
+  } else if (status === 'DELIVERED' && o.pickupStatus === 'ON_THE_WAY') {
+    var pid2 = o.pickups && o.pickups[0] ? o.pickups[0].pickupId : '';
+    actions += '<button class="act-btn act-done" onclick="act(\'completePickup\',\'' + pid2 + '\')">Recogido</button>';
   }
   actions += '<button class="act-btn act-view" onclick="viewOrder(\'' + o.orderId + '\')">Ver</button>';
+  
   return '<article class="card">' +
     '<div class="card-head">' +
     '<span class="badge">' + esc(status) + esc(pickup) + '</span>' +
-    '<span class="ref">' + esc(o.orderId ? o.orderId.slice(0, 12) : '') + '</span>' +
+    '<span class="ref">Hab. ' + esc(o.room || '') + '</span>' +
     '</div>' +
-    '<h3>Hab. ' + esc(o.room || '') + '</h3>' +
-    '<div class="room">' + esc(o.guest || '') + '</div>' +
+    '<h3>' + esc(o.guest || 'Sin nombre') + '</h3>' +
+    '<div class="room">' + esc(o.service || '') + '</div>' +
     '<div class="tags">' +
-    (o.service ? '<span class="tag">' + esc(o.service) + '</span>' : '') +
     (o.deliveryType ? '<span class="tag">' + esc(o.deliveryType) + '</span>' : '') +
+    (o.notes ? '<span class="tag">' + esc(o.notes.slice(0,30)) + '</span>' : '') +
     '</div>' +
     '<div class="info-row">' +
     '<div><small>Total</small><strong>' + (o.total ? Number(o.total).toFixed(2).replace('.', ',') + ' €' : '—') + '</strong></div>' +
-    '<div><small>Recogida</small><strong>' + esc(PICKUP_LABELS[o.pickupStatus] || 'No aplica') + '</strong></div>' +
+    '<div><small>Estado</small><strong>' + esc(status) + '</strong></div>' +
     '</div>' +
     '<div class="card-foot">' +
     '<span class="time">' + esc(time) + '</span>' +
@@ -325,12 +341,12 @@ function setStatus(btn) {
 // ---------- ACTIONS ----------
 async function act(action, id) {
   try {
-    const res = await fetch(API, {
+    var res = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: action, sessionToken: 'DUMMY', orderId: id, pickupId: id, staffName: staff })
     });
-    const data = await res.json();
+    var data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Error');
     toast('Accion completada');
     loadData();
@@ -340,31 +356,47 @@ async function act(action, id) {
 }
 
 function viewOrder(id) {
-  const o = orders.find(function(x) { return x.orderId === id; });
+  var o = orders.find(function(x) { return x.orderId === id; });
   if (!o) return;
-  alert('Detalle de comanda:\n\nHabitacion: ' + (o.room || '') + '\nHuesped: ' + (o.guest || '') + '\nEstado: ' + (STATUS_LABELS[o.orderStatus] || o.orderStatus) + '\nTotal: ' + (o.total || '0') + ' €');
+  alert('Detalle:\n\nHabitacion: ' + (o.room || '') + '\nHuesped: ' + (o.guest || '') + '\nEstado: ' + (o.orderStatus || '') + '\nTotal: ' + (o.total || '0') + ' €');
 }
 
-function openNewOrder() {
-  document.getElementById('orderModal').showModal();
+// ---------- REGISTER SERVICE ----------
+function openServiceModal() {
+  document.getElementById('serviceModal').showModal();
 }
 
-async function submitOrder(e) {
+async function submitService(e) {
   e.preventDefault();
-  const room = document.getElementById('f_room').value.trim();
-  const guest = document.getElementById('f_guest').value.trim();
-  const service = document.getElementById('f_service').value;
-  const notes = document.getElementById('f_notes').value.trim();
+  var room = document.getElementById('s_room').value.trim();
+  var type = document.getElementById('s_type').value;
+  var notes = document.getElementById('s_notes').value.trim();
+  
   try {
-    const res = await fetch(API, {
+    var payload = {
+      action: 'createGuestPickupRequest',
+      room: room,
+      guestName: staff,
+      deliveryType: type,
+      location: 'INSIDE_ROOM',
+      guestNotes: notes,
+      rating: '',
+      feedback: ''
+    };
+    
+    var res = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'createGuestOrder', room: room, guestName: guest, service: service, notes: notes, staffName: staff })
+      body: JSON.stringify(payload)
     });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Error');
-    document.getElementById('orderModal').close();
-    toast('Comanda creada');
+    var data = await res.json();
+    console.log('Service response:', data);
+    
+    if (!data.ok) throw new Error(data.error || 'Error al registrar');
+    
+    document.getElementById('serviceModal').close();
+    document.getElementById('serviceForm').reset();
+    toast('Servicio registrado');
     loadData();
   } catch (err) {
     toast(err.message, true);
@@ -377,7 +409,6 @@ function esc(v) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c];
   });
 }
-
 function toast(msg, error) {
   var el = document.getElementById('toast');
   el.textContent = msg;
