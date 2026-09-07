@@ -1,428 +1,132 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#3f4933">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500;600;700&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<title>Room Service Control</title>
-<style>
-:root{--ink:#25291f;--muted:#68705d;--cream:#f3f0e7;--paper:#fbfaf5;--wine:#657153;--wine2:#3f4933;--gold:#c3aa7a;--line:#ddd8c8;--ok:#4f6445;--danger:#8b1f35;--shadow:0 16px 45px rgba(46,55,37,.13)}
-*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Jost,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
-button,input,select{font:inherit}button{cursor:pointer}h1,h2,h3{font-family:"Josefin Sans",Georgia,serif;margin:0}
-.shell{min-height:100vh}#app[hidden]{display:none}
-.top{background:linear-gradient(120deg,var(--wine2),var(--wine));color:#fff;padding:26px clamp(18px,4vw,58px) 34px;position:relative;overflow:hidden}
-.top h1{font:500 clamp(28px,5vw,52px)/1 "Josefin Sans",serif;letter-spacing:.08em;margin:20px 0 8px}
-.brand-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
-.brand-logo{height:42px;width:auto}
-.session{display:flex;align-items:center;gap:9px;color:#eef1e8;font-size:13px}
-.session button{border:1px solid #ffffff55;background:#ffffff12;color:#fff;border-radius:9px;padding:6px 9px;font-family:"Josefin Sans";font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:22px}
-.btn{border:1px solid transparent;border-radius:12px;padding:10px 15px;font-weight:750;display:inline-flex;align-items:center;gap:7px;font-family:"Josefin Sans";font-size:12px;letter-spacing:.5px;text-transform:uppercase}
-.btn-primary{background:var(--gold);color:#21170b}
-.btn-light{background:#ffffff14;color:#fff;border-color:#ffffff30}
-.btn-wine{background:var(--wine);color:#fff}
-.main{padding:0 clamp(14px,4vw,58px) 50px;margin-top:-1px}
-.toolbar{background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:14px;display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:10px;position:sticky;top:10px;z-index:5}
-.search{position:relative}.search input{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 14px 0 42px;outline:none;font-size:14px}
-.search span{position:absolute;left:15px;top:11px;color:var(--muted)}
-.tabs{display:flex;gap:8px;margin:22px 0 8px;flex-wrap:wrap}
-.tab{border:1px solid var(--line);background:#eee7df;color:var(--muted);padding:9px 15px;border-radius:999px;font-weight:800;font-family:"Josefin Sans";font-size:11px;letter-spacing:.8px;text-transform:uppercase}
-.tab.active{background:var(--wine);color:#fff;border-color:var(--wine)}
-.summary{display:flex;justify-content:space-between;align-items:center;color:var(--muted);margin:12px 2px 20px;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 5px 18px #2e37250a;display:flex;flex-direction:column;min-height:180px;transition:.2s}
-.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.card-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:8px}
-.badge{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:850;color:var(--wine);background:#e5e9dd;padding:4px 10px;border-radius:999px}
-.ref{color:var(--muted);font-size:12px}
-.card h3{font:500 20px/1.22 "Josefin Sans",serif;margin:4px 0}
-.room{font-size:13px;color:var(--muted);margin-bottom:4px}
-.tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.tag{background:#e5e9dd;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700}
-.info-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;border-top:1px solid var(--line);padding-top:12px;font-size:12px}
-.info-row div small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
-.info-row div strong{display:block;font-size:13px;margin-top:2px}
-.card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-.card-foot .time{font-size:11px;color:var(--muted)}
-.card-foot .actions-row{display:flex;gap:6px}
-.act-btn{border:0;border-radius:8px;padding:7px 11px;font-size:11px;font-weight:800;cursor:pointer;font-family:"Josefin Sans";letter-spacing:.5px;text-transform:uppercase}
-.act-cook{background:var(--gold);color:#21170b}
-.act-delivery{background:#d4c9a8;color:#21170b}
-.act-done{background:var(--ok);color:#fff}
-.act-way{background:#1e5aa8;color:#fff}
-.act-pickup{background:var(--wine);color:#fff}
-.act-view{background:#e5e9dd;color:var(--wine2)}
-.empty{text-align:center;padding:70px 20px;color:var(--muted)}
-.loader{padding:80px;text-align:center;color:var(--muted)}
-.toast{position:fixed;right:18px;bottom:18px;z-index:20;background:#20201e;color:#fff;border-radius:12px;padding:12px 16px;box-shadow:var(--shadow);transform:translateY(100px);opacity:0;transition:.25s;font-size:13px}
-.toast.show{transform:none;opacity:1}
-.toast.error{background:var(--danger)}
-dialog{border:0;border-radius:20px;padding:0;width:min(520px,calc(100% - 22px));max-height:92vh;box-shadow:0 30px 90px #21091466;background:var(--paper)}dialog::backdrop{background:#1c1210a6;backdrop-filter:blur(3px)}
-.modal-head{position:sticky;top:0;background:var(--paper);z-index:2;display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line)}
-.modal-head h2{font:500 24px "Josefin Sans",serif;margin:0}
-.close{border:0;background:#eee7df;border-radius:50%;width:35px;height:35px;font-size:20px;cursor:pointer}
-.form{padding:20px 22px}
-.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.field label{font-size:12px;font-weight:850;color:#5f534b;text-transform:uppercase;letter-spacing:.5px}
-.field input,.field textarea,.field select{width:100%;border:1px solid #dcd0c5;border-radius:11px;background:#fff;padding:10px 11px;outline:none;font-size:14px}
-.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--wine);box-shadow:0 0 0 3px #6f173512}
-.field textarea{min-height:60px;resize:vertical}
-.modal-foot{position:sticky;bottom:0;background:var(--paper);padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:9px}
-.login-box{padding:28px}
-.login-box h2{font:500 30px "Josefin Sans",serif;margin:8px 0}
-.login-box p{color:var(--muted);font-size:14px}
-.login-box input,.login-box select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;margin:13px 0 16px;font-size:14px;background:#fff}
-.hidden{display:none!important}
-#installBtn[hidden]{display:none}
-@media(max-width:720px){.toolbar{grid-template-columns:1fr}.actions{flex-wrap:wrap}.top{padding-bottom:25px}.main{padding-inline:11px}.grid{grid-template-columns:1fr}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f8ac00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Room Service Control</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg">
+  <style>
+    :root{--yellow:#f8ac00;--mustard:#d99100;--sand:#f3dfb2;--pale:#fff2cf;--white:#fff;--black:#171717;--cream:#fbf6eb;--card:var(--white);--text:var(--black);--muted:#6f675b;--red:#c97b2b;--green:#8b9456;--orange:#d99100;--blue:#b98218;--line:#e8dcc4;--shadow:0 8px 28px rgba(23,23,23,.10)}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+    button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display:none!important}
+    .login{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--yellow)}
+    .login-card{width:min(440px,100%);background:var(--white);border:2px solid var(--white);border-radius:26px;padding:32px;box-shadow:0 28px 70px rgba(23,23,23,.22)}
+    .brand{display:block;text-align:center}.kimpton-logo{display:block;width:min(310px,90%);height:auto;margin:0 auto 22px}.login-card .kimpton-logo{background:var(--yellow);border-radius:18px;padding:16px 20px}.brand h1{font-size:23px;margin:0}.brand p{margin:7px 0 0;color:var(--muted)}
+    .field{margin-top:20px}.field label{display:block;font-weight:750;margin-bottom:9px}.field input,.field select,.field textarea{width:100%;padding:14px;border:2px solid var(--line);border-radius:13px;background:var(--white);color:var(--black)}.field input:focus,.field select:focus,.field textarea:focus{outline:3px solid rgba(248,172,0,.24);border-color:var(--yellow)}.primary{width:100%;border:0;border-radius:14px;background:var(--yellow);color:var(--black);padding:15px;font-weight:850;margin-top:20px}
+    .dev{display:inline-flex;margin-top:18px;background:var(--pale);color:var(--black);border-radius:99px;padding:7px 11px;font-size:12px;font-weight:800}
+    header{position:sticky;top:0;z-index:20;background:var(--yellow);color:var(--black);padding:12px max(16px,env(safe-area-inset-left));box-shadow:0 2px 16px rgba(23,23,23,.14)}
+    .header-inner{max-width:1400px;margin:auto;display:flex;align-items:center;gap:12px}.header-logo{width:150px;height:auto;flex:none}.header-title{flex:1;font-weight:850;font-size:15px}.header-title small{opacity:.95}.icon-btn{border:2px solid var(--black);background:transparent;color:var(--black);border-radius:12px;padding:10px 12px}.icon-btn:disabled{opacity:.55;cursor:wait}.install{background:var(--black);color:var(--white);border:0}
+    .sync{height:4px;background:transparent}.sync.loading{background:linear-gradient(90deg,var(--yellow),#fff,var(--yellow));background-size:200%;animation:load 1s linear infinite}@keyframes load{to{background-position:-200% 0}}
+    main{max-width:1400px;margin:auto;padding:18px 16px 90px}.statusbar{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:14px}.dot{width:9px;height:9px;border-radius:50%;background:var(--green)}.dot.offline{background:var(--red)}
+    .stats{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;overflow:auto;padding-bottom:6px}.stat{background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--shadow);border-left:5px solid var(--blue)}.stat b{display:block;font-size:26px}.stat span{font-size:12px;color:var(--muted);font-weight:700}.stat.urgent{border-color:var(--red)}.stat.pick{border-color:var(--orange)}
+    .tabs{display:flex;gap:8px;overflow:auto;margin:18px 0 14px}.tab{white-space:nowrap;border:2px solid var(--line);background:var(--white);color:var(--black);border-radius:99px;padding:10px 15px;font-weight:750}.tab.active{background:var(--yellow);color:var(--black);border-color:var(--yellow)}
+    .toolbar{display:flex;gap:10px;margin-bottom:15px}.search{flex:1;border:2px solid var(--line);border-radius:13px;padding:12px 14px;background:var(--white);color:var(--black)}.refresh,.register{border:0;border-radius:13px;background:var(--yellow);color:var(--black);padding:12px 16px;font-weight:800}.refresh:disabled{opacity:.55;cursor:wait}.register{background:var(--yellow);color:var(--black)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}.empty{background:#fff;border:2px dashed var(--line);border-radius:20px;padding:38px;text-align:center;color:var(--muted);grid-column:1/-1}
+    .order{background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;border-top:6px solid var(--blue)}.order.NEW{border-color:var(--red)}.order.IN_KITCHEN{border-color:var(--orange)}.order.DELIVERED{border-color:var(--green)}
+    .order-head{padding:16px;display:flex;gap:12px;align-items:flex-start}.room{background:var(--yellow);color:var(--black);border-radius:14px;padding:9px 12px;font-size:22px;font-weight:900}.meta{flex:1}.meta h3{margin:0;font-size:17px}.meta small{color:var(--muted)}.age{font-weight:800;color:var(--mustard);font-size:13px}
+    .badges{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}.badge{font-size:11px;font-weight:800;border-radius:99px;padding:5px 9px;background:var(--sand);color:var(--black)}.badge.allergy{background:#edc36b;color:var(--black)}.badge.status{background:var(--yellow);color:var(--black)}.badge.pickup{background:var(--pale);color:var(--black);border:1px solid var(--sand)}
+    .items{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 16px}.item{display:flex;gap:8px;margin:7px 0}.qty{font-weight:900;color:var(--mustard)}.variant{display:block;color:var(--muted);font-size:12px;font-style:italic}.notes{margin:12px 16px;padding:10px 12px;border-radius:12px;background:var(--pale);font-size:13px}.allergy-box{margin:12px 16px;padding:10px 12px;border-radius:12px;background:#edc36b;color:var(--black);font-weight:800;font-size:13px}
+    .actions{padding:14px 16px;display:grid;gap:8px}.action,.action.yellow,.action.green,.action.orange{border:0;border-radius:13px;padding:13px;font-weight:850;background:var(--yellow);color:var(--black)}.action:disabled{opacity:.55;cursor:wait}
+    .closed{opacity:.7}.closed .actions{display:none}.error{position:fixed;left:16px;right:16px;bottom:18px;z-index:60;margin:auto;max-width:620px;background:var(--yellow);color:var(--black);border:2px solid var(--black);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+    .modal-bg{position:fixed;inset:0;background:rgba(23,23,23,.62);display:grid;place-items:center;padding:18px;z-index:50}.modal{width:min(520px,100%);max-height:90vh;overflow:auto;background:var(--white);border-radius:22px;padding:22px}.modal h2{margin-top:0}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choice{border:2px solid var(--line);background:var(--white);color:var(--black);border-radius:14px;padding:14px;font-weight:800}.choice.selected{border-color:var(--yellow);background:var(--yellow);color:var(--black)}.modal-actions{display:flex;gap:8px}.modal-actions button{flex:1;border:0;border-radius:13px;padding:13px;font-weight:800}.cancel{background:var(--white);color:var(--black);border:2px solid var(--black)!important}.save{background:var(--yellow);color:var(--black)}
+    @media(max-width:650px){.login-card{padding:25px 20px}.stats{grid-template-columns:repeat(6,115px)}.grid{grid-template-columns:1fr}.header-logo{width:110px}.header-title{font-size:13px}.choices{grid-template-columns:1fr}.order-head{padding:14px}.room{font-size:20px}.toolbar{flex-wrap:wrap}.search{flex-basis:100%}.register,.refresh{flex:1}.icon-btn{padding:9px 10px;font-size:12px}}
+  </style>
 </head>
 <body>
-
-<div class="shell" id="app" hidden>
-  <header class="top">
-    <div class="brand-row">
-      <img class="brand-logo" src="logo.svg" alt="Kimpton">
-      <div class="session">
-        <span id="sessionName"></span>
-        <button onclick="doLogout()">Cerrar sesion</button>
-      </div>
+  <section id="login" class="login">
+    <div class="login-card">
+      <div class="brand"><img class="kimpton-logo" src="./kimpton-logo.svg" alt="Kimpton Los Monteros Marbella"><h1>Aplicación interna de Room Service</h1><p>Acceso exclusivo para el equipo</p></div>
+      <span class="dev">MODO DEVELOPMENT</span>
+      <div class="field"><label for="userSelect">Selecciona tu usuario</label><select id="userSelect"><option value="">Cargando usuarios…</option></select></div>
+      <div class="field"><label for="passwordInput">Contraseña</label><input id="passwordInput" type="password" autocomplete="current-password" placeholder="Introduce tu apellido"></div>
+      <button id="loginButton" class="primary">Entrar al panel</button>
+      <p id="loginError" style="color:#8c4c00;font-size:13px;font-weight:700"></p>
     </div>
-    <h1>Room Service Control</h1>
-    <div class="actions">
-      <button class="btn btn-primary" onclick="openServiceModal()">+ Registrar servicio</button>
-      <button class="btn btn-light" onclick="loadData()">&#x21bb; Actualizar</button>
-      <button class="btn btn-light" id="installBtn" hidden onclick="installApp()">&#x2193; Instalar app</button>
-    </div>
-  </header>
-  <main class="main">
-    <div class="toolbar">
-      <div class="search"><span>&#x2315;</span><input id="search" type="search" placeholder="Buscar habitacion, huesped..." autocomplete="off" oninput="render()"></div>
-    </div>
-    <div class="tabs">
-      <button class="tab active" data-status="all" onclick="setStatus(this)">Todas</button>
-      <button class="tab" data-status="NEW" onclick="setStatus(this)">Nuevas</button>
-      <button class="tab" data-status="IN_KITCHEN" onclick="setStatus(this)">En cocina</button>
-      <button class="tab" data-status="DELIVERED" onclick="setStatus(this)">Entregadas</button>
-      <button class="tab" data-status="pickup" onclick="setStatus(this)">Recogidas</button>
-    </div>
-    <div class="summary"><span id="resultCount">Cargando...</span><span id="updated"></span></div>
-    <section id="content" class="loader">Cargando comandas...</section>
-  </main>
-</div>
+  </section>
 
-<dialog id="loginModal">
-  <div class="login-box">
-    <div style="color:var(--wine);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase">Kimpton Los Monteros</div>
-    <h2>Room Service</h2>
-    <p>Selecciona tu nombre para entrar al panel de control.</p>
-    <select id="staffInput">
-      <option value="" disabled selected>-- Elige tu nombre --</option>
-      <option value="Marlen">Marlen Andrade</option>
-      <option value="Sandra">Sandra Rivera</option>
-      <option value="Helena">Helena Carrasco</option>
-      <option value="Gonzalo">Gonzalo Bueno</option>
-      <option value="Gustavo">Gustavo Vidales</option>
-      <option value="Alejandro">Alejandro Rodriguez</option>
-      <option value="Rafa">Rafael Moreno</option>
-      <option value="Ignacio">Ignacio Aparicio</option>
-      <option value="Ivan">Ivan Zambrano</option>
-    </select>
-    <button class="btn btn-wine" type="button" onclick="doLogin()" style="width:100%;justify-content:center">Entrar</button>
-    <p id="loginError" style="color:var(--danger);font-size:13px;margin-top:12px" class="hidden"></p>
-  </div>
-</dialog>
+  <section id="app" class="hidden">
+    <header><div class="header-inner"><img class="header-logo" src="./kimpton-logo.svg" alt="Kimpton"><div class="header-title"><span id="currentUser"></span></div><button id="installButton" class="icon-btn install hidden">Instalar</button><button id="logoutButton" class="icon-btn">Cerrar sesión</button></div><div id="syncBar" class="sync"></div></header>
+    <main>
+      <div class="statusbar"><span id="onlineDot" class="dot"></span><span id="connectionText">Conectado</span><span>·</span><span id="lastUpdate">Sin actualizar</span></div>
+      <div id="stats" class="stats"></div>
+      <div class="tabs"><button class="tab active" data-tab="active">Operativa</button><button class="tab" data-tab="pickups">Recogidas</button><button class="tab" data-tab="closed">Completados</button><button class="tab" data-tab="all">Todos</button></div>
+      <div class="toolbar"><input id="search" class="search" placeholder="Buscar habitación, huésped o pedido"><button id="registerServiceButton" class="register">+ Registrar servicio</button><button id="refreshButton" class="refresh">Actualizar</button></div>
+      <div id="orders" class="grid"></div>
+    </main>
+  </section>
 
-<dialog id="serviceModal">
-  <form id="serviceForm" class="form" onsubmit="submitService(event)">
-    <div class="modal-head">
-      <h2>Registrar servicio</h2>
-      <button type="button" class="close" onclick="document.getElementById('serviceModal').close()">&times;</button>
-    </div>
-    <div class="form">
-      <div class="field"><label>Habitacion</label><input id="s_room" inputmode="numeric" placeholder="ej. 215" required></div>
-      <div class="field"><label>Tipo de servicio</label>
-        <select id="s_type" required>
-          <option value="TRAY">Bandeja (con recogida)</option>
-          <option value="TABLE_TROLLEY">Carro / Mesa (con recogida)</option>
-          <option value="DRINKS_ONLY">Solo bebidas (sin recogida)</option>
-        </select>
-      </div>
-      <div class="field"><label>Notas</label><textarea id="s_notes" placeholder="Alergias, preferencias, hora..."></textarea></div>
-    </div>
-    <div class="modal-foot">
-      <button type="button" class="btn btn-light" onclick="document.getElementById('serviceModal').close()">Cancelar</button>
-      <button type="submit" class="btn btn-wine">Registrar</button>
-    </div>
-  </form>
-</dialog>
+  <div id="deliveryModal" class="modal-bg hidden"><div class="modal"><h2>Seleccionar entrega</h2><p id="modalOrder"></p><div class="choices" id="deliveryChoices"></div><div class="field"><label for="materialDetails">Detalle adicional <small>(opcional)</small></label><textarea id="materialDetails" rows="3" placeholder="Ej.: 1 bandeja, 2 platos y 2 copas"></textarea></div><div class="modal-actions"><button id="cancelModal" class="cancel">Cancelar</button><button id="saveDelivery" class="save">Guardar</button></div></div></div>
+  <div id="manualServiceModal" class="modal-bg hidden"><div id="manualServiceContent" class="modal"><h2>Registrar servicio entregado</h2><p id="manualIntro">La fecha y hora se guardarán automáticamente.</p><div class="field"><label for="manualRoom">Habitación</label><input id="manualRoom" inputmode="numeric" autocomplete="off" placeholder="Ej.: 611"></div><div class="field"><label>Formato de entrega</label><div class="choices"><button class="choice manual-choice" data-type="TABLE_TROLLEY">Mesa/trolley</button><button class="choice manual-choice" data-type="TRAY">Bandeja</button><button class="choice manual-choice" data-type="DRINKS_ONLY">Solo bebida · sin recogida</button><button class="choice manual-choice" data-type="DRINKS_GLASSWARE">Bebidas/cristalería</button><button class="choice manual-choice" data-type="CROCKERY">Vajilla</button><button class="choice manual-choice" data-type="OTHER">Otro</button></div></div><div id="manualNotesField" class="field"><label for="manualNotes">Observaciones <small>(opcional)</small></label><textarea id="manualNotes" rows="3" placeholder="Información útil para la recogida"></textarea></div><div id="manualActions" class="modal-actions"><button id="cancelManualService" class="cancel">Cancelar</button><button id="saveManualService" class="save">Registrar</button></div></div></div>
+  <div id="errorToast" class="error hidden"></div>
 
-<div id="toast" class="toast"></div>
+  <script>
+    var API = 'https://script.google.com/macros/s/AKfycbxtmnl_DaupQLnuEpyp_LCjZ-hScwNCS7u71uj5Biinp9zL3S1UrUYELqT9_ITr3XRZQg/exec';
+    var quickServiceMode = new URLSearchParams(window.location.search).get('quickService') === '1';
+    var state = { user:null, sessionToken:'', data:null, tab:'active', search:'', loading:false, lastUpdatedAt:null, modalOrderId:null, deliveryType:null, manualDeliveryType:null, previousNew:0, previousRequested:0 };
+    var deliveryLabels = { TABLE_TROLLEY:'Mesa / carro', TRAY:'Bandeja', DRINKS_ONLY:'Solo bebida · sin recogida', DRINKS_GLASSWARE:'Bebidas / cristalería', CROCKERY:'Vajilla', OTHER:'Otro' };
+    var pickupLocationLabels = { INSIDE_ROOM:'Dentro de la habitación', OUTSIDE_DOOR:'Fuera de la puerta', TERRACE:'Terraza', OTHER:'Otra ubicación' };
+    var statusLabels = { NEW:'Nueva', IN_KITCHEN:'Marchando en cocina', READY:'Preparada', DELIVERED:'Entregada', CANCELLED:'Cancelada', NOT_SELECTED:'Sin formato', SELECTED:'Formato seleccionado', NOT_REQUIRED:'Sin recogida', PENDING:'Pendiente de recogida', REQUESTED:'Recogida solicitada', ON_THE_WAY:'En camino', COMPLETED:'Recogida completada' };
 
-<script>
-// Pega aquí la URL de la implementación de Apps Script terminada en /exec.
-// No uses la URL del editor ni la antigua URL de Cloudflare.
-const API = 'PEGA_AQUI_LA_URL_DE_APPS_SCRIPT_EXEC';
-let staff = '';
-let orders = [];
-let currentStatus = 'all';
-let installPrompt = null;
-
-function apiReady() {
-  return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(API);
-}
-
-async function apiPost(payload) {
-  if (!apiReady()) throw new Error('Falta configurar la URL /exec de Apps Script en la constante API.');
-  const response = await fetch(API, {
-    method: 'POST',
-    redirect: 'follow',
-    // text/plain evita el preflight CORS que bloquea Apps Script desde GitHub Pages/PWA.
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
-  });
-  const text = await response.text();
-  let data;
-  try { data = JSON.parse(text); }
-  catch (error) { throw new Error('Apps Script devolvió una respuesta no válida. Revisa que la implementación permita acceso a cualquiera.'); }
-  return data;
-}
-
-// ---------- PWA INSTALL ----------
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  installPrompt = e;
-  document.getElementById('installBtn').hidden = false;
-});
-function installApp() {
-  if (!installPrompt) return;
-  installPrompt.prompt();
-  installPrompt = null;
-  document.getElementById('installBtn').hidden = true;
-}
-window.addEventListener('appinstalled', function() {
-  document.getElementById('installBtn').hidden = true;
-  toast('App instalada');
-});
-
-// ---------- AUTH ----------
-function doLogin() {
-  var name = document.getElementById('staffInput').value.trim();
-  if (!name) {
-    document.getElementById('loginError').textContent = 'Selecciona tu nombre.';
-    document.getElementById('loginError').classList.remove('hidden');
-    return;
-  }
-  document.getElementById('loginError').classList.add('hidden');
-  startSession(name);
-}
-function startSession(name) {
-  staff = name;
-  localStorage.setItem('rs_staffName', staff);
-  document.getElementById('sessionName').textContent = staff;
-  document.getElementById('app').hidden = false;
-  if (document.getElementById('loginModal').open) document.getElementById('loginModal').close();
-  loadData();
-}
-function doLogout() {
-  localStorage.removeItem('rs_staffName');
-  staff = '';
-  document.getElementById('app').hidden = true;
-  document.getElementById('staffInput').value = '';
-  document.getElementById('loginModal').showModal();
-}
-var saved = localStorage.getItem('rs_staffName');
-if (saved) startSession(saved);
-else document.getElementById('loginModal').showModal();
-
-// ---------- DATA ----------
-async function loadData() {
-  document.getElementById('content').className = 'loader';
-  document.getElementById('content').textContent = 'Cargando...';
-  try {
-    // Intentar health primero para ver si el backend responde
-    const healthData = await apiPost({ action: 'health' });
-    console.log('Health:', healthData);
-
-    // Luego intentar dashboard
-    const data = await apiPost({ action: 'dashboard', sessionToken: 'DUMMY', staffName: staff });
-    console.log('Dashboard:', data);
-    
-    if (!data.ok) {
-      throw new Error(data.error || 'El backend no reconoce la accion "dashboard". Necesitas actualizar el Apps Script.');
+    document.addEventListener('DOMContentLoaded', init);
+    function init(){
+      if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+      bindEvents(); loadUsers();
+      var saved=localStorage.getItem('rsSession'); if(saved){try{var session=JSON.parse(saved);state.user=session.user;state.sessionToken=session.sessionToken||'';}catch(e){localStorage.removeItem('rsSession');}}
+      window.rsElapsedTimer=setInterval(updateLastUpdatedLabel,1000);
     }
-    orders = data.orders || [];
-    document.getElementById('updated').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-    render();
-  } catch (err) {
-    document.getElementById('content').className = 'empty';
-    document.getElementById('content').innerHTML = 
-      '<h3>Error de conexion</h3>' +
-      '<p>' + esc(err.message) + '</p>' +
-      '<p style="font-size:12px;color:var(--muted);margin-top:10px">' +
-      'Si ves "action post no reconocida", el Apps Script necesita una funcion <b>dashboard</b>. ' +
-      'Pasa el codigo del nuevo Apps Script para arreglarlo.</p>';
-    toast(err.message, true);
-  }
-}
-
-// ---------- RENDER ----------
-function render() {
-  var q = String(document.getElementById('search').value || '').toLowerCase().trim();
-  var list = orders;
-  if (currentStatus === 'pickup') {
-    list = orders.filter(function(o) {
-      return o.pickupStatus && o.pickupStatus !== 'NOT_REQUIRED' && o.pickupStatus !== 'COMPLETED';
-    });
-  } else if (currentStatus !== 'all') {
-    list = orders.filter(function(o) { return o.orderStatus === currentStatus; });
-  }
-  if (q) {
-    list = list.filter(function(o) {
-      return String(o.room || '').toLowerCase().includes(q) ||
-             String(o.guest || '').toLowerCase().includes(q);
-    });
-  }
-  document.getElementById('resultCount').textContent = list.length + ' comanda' + (list.length !== 1 ? 's' : '');
-  if (!list.length) {
-    document.getElementById('content').className = 'empty';
-    document.getElementById('content').innerHTML = '<h3>No hay comandas</h3>';
-    return;
-  }
-  document.getElementById('content').className = '';
-  document.getElementById('content').innerHTML = '<div class="grid">' + list.map(card).join('') + '</div>';
-}
-
-function card(o) {
-  var status = o.orderStatus || 'NEW';
-  var pickup = o.pickupStatus && o.pickupStatus !== 'NOT_REQUIRED' ? (' · ' + o.pickupStatus) : '';
-  var time = o.createdAt ? new Date(o.createdAt).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}) : '';
-  var actions = '';
-  
-  if (status === 'NEW') {
-    actions += '<button class="act-btn act-cook" onclick="act(\'startCooking\',\'' + o.orderId + '\')">Cocina</button>';
-  } else if (status === 'IN_KITCHEN') {
-    actions += '<button class="act-btn act-delivery" onclick="act(\'selectDeliveryType\',\'' + o.orderId + '\')">Entrega</button>';
-  } else if (status === 'DELIVERED' && o.pickupStatus === 'REQUESTED') {
-    var pid = o.pickups && o.pickups[0] ? o.pickups[0].pickupId : '';
-    actions += '<button class="act-btn act-way" onclick="act(\'pickupOnWay\',\'' + pid + '\')">En camino</button>';
-    actions += '<button class="act-btn act-done" onclick="act(\'completePickup\',\'' + pid + '\')">Recogido</button>';
-  } else if (status === 'DELIVERED' && o.pickupStatus === 'ON_THE_WAY') {
-    var pid2 = o.pickups && o.pickups[0] ? o.pickups[0].pickupId : '';
-    actions += '<button class="act-btn act-done" onclick="act(\'completePickup\',\'' + pid2 + '\')">Recogido</button>';
-  }
-  actions += '<button class="act-btn act-view" onclick="viewOrder(\'' + o.orderId + '\')">Ver</button>';
-  
-  return '<article class="card">' +
-    '<div class="card-head">' +
-    '<span class="badge">' + esc(status) + esc(pickup) + '</span>' +
-    '<span class="ref">Hab. ' + esc(o.room || '') + '</span>' +
-    '</div>' +
-    '<h3>' + esc(o.guest || 'Sin nombre') + '</h3>' +
-    '<div class="room">' + esc(o.service || '') + '</div>' +
-    '<div class="tags">' +
-    (o.deliveryType ? '<span class="tag">' + esc(o.deliveryType) + '</span>' : '') +
-    (o.notes ? '<span class="tag">' + esc(o.notes.slice(0,30)) + '</span>' : '') +
-    '</div>' +
-    '<div class="info-row">' +
-    '<div><small>Total</small><strong>' + (o.total ? Number(o.total).toFixed(2).replace('.', ',') + ' €' : '—') + '</strong></div>' +
-    '<div><small>Estado</small><strong>' + esc(status) + '</strong></div>' +
-    '</div>' +
-    '<div class="card-foot">' +
-    '<span class="time">' + esc(time) + '</span>' +
-    '<div class="actions-row">' + actions + '</div>' +
-    '</div>' +
-    '</article>';
-}
-
-function setStatus(btn) {
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  btn.classList.add('active');
-  currentStatus = btn.dataset.status;
-  document.getElementById('search').value = '';
-  render();
-}
-
-// ---------- ACTIONS ----------
-async function act(action, id) {
-  try {
-    var data = await apiPost({ action: action, sessionToken: 'DUMMY', orderId: id, pickupId: id, staffName: staff });
-    if (!data.ok) throw new Error(data.error || 'Error');
-    toast('Accion completada');
-    loadData();
-  } catch (err) {
-    toast(err.message, true);
-  }
-}
-
-function viewOrder(id) {
-  var o = orders.find(function(x) { return x.orderId === id; });
-  if (!o) return;
-  alert('Detalle:\n\nHabitacion: ' + (o.room || '') + '\nHuesped: ' + (o.guest || '') + '\nEstado: ' + (o.orderStatus || '') + '\nTotal: ' + (o.total || '0') + ' €');
-}
-
-// ---------- REGISTER SERVICE ----------
-function openServiceModal() {
-  document.getElementById('serviceModal').showModal();
-}
-
-async function submitService(e) {
-  e.preventDefault();
-  var room = document.getElementById('s_room').value.trim();
-  var type = document.getElementById('s_type').value;
-  var notes = document.getElementById('s_notes').value.trim();
-  
-  try {
-    var payload = {
-      action: 'createManualService',
-      sessionToken: 'DUMMY',
-      staffName: staff,
-      room: room,
-      deliveryType: type,
-      notes: notes
-    };
-    
-    var data = await apiPost(payload);
-    console.log('Service response:', data);
-    
-    if (!data.ok) throw new Error(data.error || 'Error al registrar');
-    
-    document.getElementById('serviceModal').close();
-    document.getElementById('serviceForm').reset();
-    toast('Servicio registrado');
-    loadData();
-  } catch (err) {
-    toast(err.message, true);
-  }
-}
-
-// ---------- UTILS ----------
-function esc(v) {
-  return String(v || '').replace(/[&<>'"]/g, function(c) {
-    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c];
-  });
-}
-function toast(msg, error) {
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (error ? ' error' : '');
-  setTimeout(function() { el.className = 'toast'; }, 3500);
-}
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('./sw.js').catch(function(error) {
-      console.warn('No se pudo registrar el service worker:', error);
-    });
-  });
-}
-</script>
+    function bindEvents(){
+      document.getElementById('loginButton').onclick=login;
+      document.getElementById('passwordInput').onkeydown=function(e){if(e.key==='Enter')login();};
+      document.getElementById('logoutButton').onclick=logout;
+      document.getElementById('refreshButton').onclick=loadDashboard;
+      document.getElementById('registerServiceButton').onclick=openManualService;
+      document.getElementById('search').oninput=function(e){state.search=e.target.value.toLowerCase();renderOrders();};
+      document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});b.classList.add('active');state.tab=b.dataset.tab;renderOrders();};});
+      document.getElementById('cancelModal').onclick=closeModal;
+      document.getElementById('saveDelivery').onclick=saveDelivery;
+      document.getElementById('cancelManualService').onclick=closeManualService;
+      document.getElementById('saveManualService').onclick=saveManualService;
+      document.querySelectorAll('.manual-choice').forEach(function(b){b.onclick=function(){document.querySelectorAll('.manual-choice').forEach(function(x){x.classList.remove('selected');});b.classList.add('selected');state.manualDeliveryType=b.dataset.type;if(quickServiceMode)saveManualService();};});
+      window.addEventListener('online',updateConnection); window.addEventListener('offline',updateConnection); updateConnection();
+    }
+    async function loadUsers(){
+      try{var d=await apiGet('users');var s=document.getElementById('userSelect');s.innerHTML='<option value="">Selecciona tu nombre</option>'+d.users.map(function(u){return '<option value="'+esc(u.userId)+'">'+esc(u.displayName)+' — '+esc(u.role)+'</option>';}).join('');if(state.user){s.value=state.user.userId;showApp();}}
+      catch(e){document.getElementById('loginError').textContent=e.message;}
+    }
+    function login(){var id=document.getElementById('userSelect').value;var password=document.getElementById('passwordInput').value;if(!id||!password){document.getElementById('loginError').textContent='Selecciona tu usuario e introduce tu contraseña.';return;}var button=document.getElementById('loginButton');button.disabled=true;button.textContent='Comprobando…';apiPost({action:'login',userId:id,password:password},true).then(function(d){state.user=d.user;state.sessionToken=d.sessionToken;localStorage.setItem('rsSession',JSON.stringify({user:state.user,sessionToken:state.sessionToken}));document.getElementById('passwordInput').value='';document.getElementById('loginError').textContent='';playTone(520);showApp();}).catch(function(e){document.getElementById('loginError').textContent=e.message;}).finally(function(){button.disabled=false;button.textContent='Entrar al panel';});}
+    function logout(){var token=state.sessionToken;if(token)apiPost({action:'logout',sessionToken:token},true).catch(function(){});localStorage.removeItem('rsSession');state.user=null;state.sessionToken='';state.data=null;state.lastUpdatedAt=null;if(window.rsTimer){clearInterval(window.rsTimer);window.rsTimer=null;}document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('passwordInput').value='';}
+    function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('currentUser').textContent=state.user.displayName;if(quickServiceMode){setTimeout(openManualService,0);return;}loadDashboard();if(!window.rsTimer)window.rsTimer=setInterval(loadDashboard,5000);}
+    async function loadDashboard(){if(state.loading)return;state.loading=true;var refresh=document.getElementById('refreshButton');refresh.disabled=true;refresh.textContent='Actualizando…';document.getElementById('syncBar').classList.add('loading');updateLastUpdatedLabel();try{var d=await apiGet('dashboard');if(state.data){if(d.counts.new>state.previousNew)playTone(760);if(d.counts.pickupRequested>state.previousRequested)playTone(980);}state.data=d;state.previousNew=d.counts.new;state.previousRequested=d.counts.pickupRequested;state.lastUpdatedAt=Date.now();render();updateLastUpdatedLabel();}catch(e){if(/sesión|sesion/i.test(e.message)){logout();}showError(e);}finally{state.loading=false;refresh.disabled=false;refresh.textContent='Actualizar';document.getElementById('syncBar').classList.remove('loading');}}
+    function updateLastUpdatedLabel(){var label=document.getElementById('lastUpdate');if(!label)return;if(state.loading){label.textContent='Actualizando la base de datos…';return;}if(!state.lastUpdatedAt){label.textContent='Sin actualizar';return;}var seconds=Math.max(0,Math.floor((Date.now()-state.lastUpdatedAt)/1000));label.textContent=seconds<60?'Actualizado hace '+seconds+' s':'Actualizado hace '+Math.floor(seconds/60)+' min';}
+    function render(){renderStats();renderOrders();}
+    function renderStats(){var c=state.data.counts;var values=[['Nuevas',c.new,'urgent'],['En cocina',c.inKitchen,''],['Entregadas',c.delivered,''],['Por recoger',c.pickupPending,'pick'],['Solicitadas',c.pickupRequested,'urgent'],['En camino',c.pickupOnTheWay,'pick']];document.getElementById('stats').innerHTML=values.map(function(x){return '<div class="stat '+x[2]+'"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>';}).join('');}
+    function renderOrders(){if(!state.data)return;var list=state.data.orders.filter(matchTab).filter(function(o){var q=state.search;return !q||String(o.room).toLowerCase().includes(q)||String(o.guest).toLowerCase().includes(q)||String(o.orderId).toLowerCase().includes(q);});document.getElementById('orders').innerHTML=list.length?list.map(orderCard).join(''):'<div class="empty"><strong>No hay comandas en esta vista</strong><br><small>El panel se actualiza automáticamente.</small></div>';bindDynamicActions();}
+    function matchTab(o){if(state.tab==='all')return true;if(state.tab==='closed')return o.pickupStatus==='COMPLETED'||(o.orderStatus==='DELIVERED'&&o.pickupStatus==='NOT_REQUIRED')||o.orderStatus==='CANCELLED';if(state.tab==='pickups')return ['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus);return o.pickupStatus!=='COMPLETED'&&!(o.orderStatus==='DELIVERED'&&o.pickupStatus==='NOT_REQUIRED')&&o.orderStatus!=='CANCELLED';}
+    function orderCard(o){var manual=o.source==='STAFF_MANUAL';var items=o.items.map(function(i){return '<div class="item"><span class="qty">'+i.quantity+'×</span><span><b>'+esc(i.nameEs)+'</b>'+(i.variantEs?'<span class="variant">'+esc(i.variantEs)+'</span>':'')+'</span></div>';}).join('');var itemsBlock=items?'<div class="items">'+items+'</div>':'';var age=minutesAgo(o.createdAt);var orderLabel=statusLabels[o.orderStatus]||o.orderStatus;var deliveryLabel=statusLabels[o.deliveryStatus]||o.deliveryStatus;var deliveryBadge=deliveryLabel&&deliveryLabel!==orderLabel?'<span class="badge">'+esc(deliveryLabel)+'</span>':'';var pickup='<span class="badge pickup">'+esc(statusLabels[o.pickupStatus]||o.pickupStatus)+'</span>';var allergy=o.allergy==='Sí'?'<div class="allergy-box">⚠ Alergia/intolerancia: '+esc(o.allergyDetail||'Sí')+'</div>':'';var notes=o.notes?'<div class="notes">📝 '+esc(o.notes)+'</div>':'';var closed=o.pickupStatus==='COMPLETED'||(o.orderStatus==='DELIVERED'&&o.pickupStatus==='NOT_REQUIRED')?' closed':'';return '<article class="order '+esc(o.orderStatus)+closed+'" data-id="'+esc(o.orderId)+'"><div class="order-head"><div class="room">'+esc(o.room)+'</div><div class="meta"><h3>'+esc(manual?'Registrado por '+o.assignedTo:o.guest)+'</h3><small>'+esc(manual?'Entrega registrada':o.pax+' pax')+' · '+formatTime(o.createdAt)+'</small></div><span class="age">'+age+' min</span></div><div class="badges"><span class="badge status">'+esc(orderLabel)+'</span>'+deliveryBadge+pickup+(manual?'<span class="badge">STAFF</span>':'')+(o.allergy==='Sí'?'<span class="badge allergy">ALERGIA</span>':'')+'</div>'+allergy+itemsBlock+notes+deliveryInfo(o)+pickupInfo(o)+'<div class="actions">'+buttonsFor(o)+'</div></article>';}
+    function deliveryInfo(o){if(!o.deliveries||!o.deliveries.length)return '';var d=o.deliveries[o.deliveries.length-1];return '<div class="notes"><b>Entrega:</b> '+esc(deliveryLabels[d.deliveryType]||d.deliveryType)+(d.materialDetails?'<br>'+esc(d.materialDetails):'')+'</div>';}
+    function pickupInfo(o){if(!o.pickups||!o.pickups.length)return '';var p=o.pickups[o.pickups.length-1];var person=p.pickupStatus==='COMPLETED'&&p.collectedByName?'<br><b>Recogido por:</b> '+esc(p.collectedByName)+(p.collectedAt?' · '+formatDateTime(p.collectedAt):''):(p.assignedToName?'<br>Asignada a '+esc(p.assignedToName):'');var guest=p.guestName?'<br><b>Huésped:</b> '+esc(p.guestName):'';var where=p.location?'<br><b>Ubicación:</b> '+esc(pickupLocationLabels[p.location]||p.location):'';var rating=p.rating?'<br><b>Valoración:</b> '+esc(p.rating)+'/5':'';var feedback=p.feedback?'<br><b>Feedback:</b> '+esc(p.feedback):'';return '<div class="notes"><b>Recogida:</b> '+esc(statusLabels[p.pickupStatus]||p.pickupStatus)+guest+where+(p.guestNotes?'<br><b>Notas:</b> '+esc(p.guestNotes):'')+rating+feedback+person+'</div>';}
+    function buttonsFor(o){var buttons='';if(o.orderStatus==='NEW')buttons='<button class="action yellow" data-action="startCooking">👨‍🍳 Marchando en cocina</button>';else if(o.orderStatus==='IN_KITCHEN'&&o.deliveryStatus==='NOT_SELECTED')buttons='<button class="action orange" data-action="delivery">Seleccionar mesa, bandeja o bebidas</button>';else if(o.orderStatus==='IN_KITCHEN'&&o.deliveryStatus==='SELECTED')buttons='<button class="action green" data-action="markDelivered">✅ Entregado</button>';else if(o.pickupStatus==='REQUESTED')buttons='<button class="action orange" data-action="pickupOnWay">🚶 En camino para recoger</button><button class="action green" data-action="completeDeliveryPickup">✅ Recogido</button>';else if(o.pickupStatus==='ON_THE_WAY')buttons='<button class="action green" data-action="completeDeliveryPickup">✅ Recogido</button>';else if(o.pickupStatus==='PENDING')buttons='<button class="action" disabled>Esperando recogida</button><button class="action green" data-action="completeDeliveryPickup">✅ Recogido</button>';if(state.user&&state.user.role==='ADMIN')buttons+='<button class="action" data-action="deleteOrder">Eliminar del panel</button>';return buttons;}
+    function bindDynamicActions(){document.querySelectorAll('[data-action]').forEach(function(b){b.onclick=function(){var card=b.closest('[data-id]');var id=card.dataset.id;var action=b.dataset.action;if(action==='delivery'){openDelivery(id);return;}if(action==='deleteOrder'&&!confirm('¿Eliminar esta comanda del panel? El historial se conservará.'))return;var order=state.data.orders.find(function(o){return o.orderId===id;});var body={action:action,userId:state.user.userId,orderId:id};if(action==='pickupOnWay'){var p=order.pickups[order.pickups.length-1];body.pickupId=p.pickupId;}if(action==='completeDeliveryPickup'){var d=order.deliveries[order.deliveries.length-1];body.deliveryId=d.deliveryId;}b.disabled=true;apiPost(body).then(loadDashboard).catch(showError).finally(function(){b.disabled=false;});};});}
+    function openDelivery(orderId){state.modalOrderId=orderId;state.deliveryType=null;document.getElementById('modalOrder').textContent='Pedido '+orderId;document.getElementById('materialDetails').value='';var choices=document.getElementById('deliveryChoices');choices.innerHTML=Object.keys(deliveryLabels).map(function(k){return '<button class="choice" data-type="'+k+'">'+deliveryLabels[k]+'</button>';}).join('');choices.querySelectorAll('.choice').forEach(function(b){b.onclick=function(){choices.querySelectorAll('.choice').forEach(function(x){x.classList.remove('selected');});b.classList.add('selected');state.deliveryType=b.dataset.type;};});document.getElementById('deliveryModal').classList.remove('hidden');}
+    function closeModal(){document.getElementById('deliveryModal').classList.add('hidden');state.modalOrderId=null;state.deliveryType=null;}
+    function saveDelivery(){if(!state.deliveryType){showError(new Error('Selecciona el tipo de entrega.'));return;}var details=document.getElementById('materialDetails').value.trim();apiPost({action:'selectDeliveryType',orderId:state.modalOrderId,deliveryType:state.deliveryType,materialDetails:details,userId:state.user.userId}).then(function(){closeModal();return loadDashboard();}).catch(showError);}
+    function openManualService(){state.manualDeliveryType=null;document.getElementById('manualRoom').value='';document.getElementById('manualNotes').value='';document.querySelectorAll('.manual-choice').forEach(function(x){x.classList.remove('selected');x.disabled=false;});document.getElementById('manualNotesField').classList.toggle('hidden',quickServiceMode);document.getElementById('manualActions').classList.toggle('hidden',quickServiceMode);document.getElementById('manualIntro').textContent=quickServiceMode?'Escribe la habitación y pulsa el tipo de servicio. Se registrará automáticamente.':'La fecha y hora se guardarán automáticamente.';document.getElementById('manualServiceModal').classList.remove('hidden');setTimeout(function(){document.getElementById('manualRoom').focus();},100);}
+    function closeManualService(){document.getElementById('manualServiceModal').classList.add('hidden');state.manualDeliveryType=null;}
+    function saveManualService(){var room=document.getElementById('manualRoom').value.trim();if(!room){state.manualDeliveryType=null;document.querySelectorAll('.manual-choice').forEach(function(x){x.classList.remove('selected');});showError(new Error('Introduce primero la habitación.'));document.getElementById('manualRoom').focus();return;}if(!state.manualDeliveryType){showError(new Error('Selecciona el tipo de servicio.'));return;}var button=document.getElementById('saveManualService');button.disabled=true;document.querySelectorAll('.manual-choice').forEach(function(x){x.disabled=true;});apiPost({action:'createManualService',room:room,deliveryType:state.manualDeliveryType,notes:quickServiceMode?'':document.getElementById('manualNotes').value.trim(),userId:state.user.userId}).then(function(){playTone(620);if(quickServiceMode){document.getElementById('manualServiceContent').innerHTML='<div style="text-align:center;padding:18px 4px"><div style="font-size:56px">✅</div><h2>Servicio registrado</h2><p>Habitación <b>'+esc(room)+'</b> · '+esc(deliveryLabels[state.manualDeliveryType]||state.manualDeliveryType)+'</p><p style="color:var(--muted)">Ya puedes cerrar esta ventana.</p><button class="primary" onclick="window.close()">Cerrar</button></div>';return;}closeManualService();return loadDashboard();}).catch(function(e){document.querySelectorAll('.manual-choice').forEach(function(x){x.disabled=false;});showError(e);}).finally(function(){if(button)button.disabled=false;});}
+    async function apiGet(action){assertApiConfigured();var url=API+'?action='+encodeURIComponent(action);if(state.sessionToken&&action!=='users')url+='&sessionToken='+encodeURIComponent(state.sessionToken);var r=await fetch(url,{cache:'no-store'});var d=await r.json();if(!d.ok)throw new Error(d.error||'Error de API');return d;}
+    function assertApiConfigured(){if(!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(API))throw new Error('Falta configurar la URL /exec de Apps Script.');} async function apiPost(body,skipSession){assertApiConfigured();var payload=Object.assign({},body);if(!skipSession&&state.sessionToken)payload.sessionToken=state.sessionToken;var r=await fetch(API,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});var text=await r.text();var d;try{d=JSON.parse(text);}catch(e){throw new Error('Apps Script devolvió una respuesta no válida. Comprueba la implementación /exec.');}if(!d.ok)throw new Error(d.error||'Error de API');return d;}
+    function updateConnection(){var on=navigator.onLine;document.getElementById('onlineDot').classList.toggle('offline',!on);document.getElementById('connectionText').textContent=on?'Conectado':'Sin conexión';}
+    function showError(e){var t=document.getElementById('errorToast');t.textContent=e.message||String(e);t.classList.remove('hidden');setTimeout(function(){t.classList.add('hidden');},5000);}
+    function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+    function formatTime(v){return new Date(v).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});}
+    function formatDateTime(v){return new Date(v).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+    function minutesAgo(v){return Math.max(0,Math.floor((Date.now()-new Date(v).getTime())/60000));}
+    function playTone(freq){try{var a=new(window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator();var g=a.createGain();o.frequency.value=freq;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.08,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.25);o.start();o.stop(a.currentTime+.25);}catch(e){}}
+    var deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var b=document.getElementById('installButton');b.classList.remove('hidden');b.onclick=function(){deferredPrompt.prompt();deferredPrompt.userChoice.finally(function(){b.classList.add('hidden');deferredPrompt=null;});};});
+  </script>
 </body>
 </html>

@@ -1,14 +1,16 @@
 {
   "name": "Room Service Control",
   "short_name": "RS Control",
+  "description": "Gestión interna de comandas, entregas y recogidas de Room Service",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#3f4933",
-  "theme_color": "#3f4933",
+  "background_color": "#ffffff",
+  "theme_color": "#f8ac00",
+  "orientation": "any",
   "icons": [
     {
-      "src": "logo.svg",
+      "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

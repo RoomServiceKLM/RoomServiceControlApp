@@ -1,5 +1,5 @@
-const CACHE_NAME = 'rs-control-v2';
-const APP_SHELL = ['./', './index.html', './manifest.json', './logo.svg'];
+const CACHE_NAME = 'rs-control-v7';
+const APP_SHELL = ['./', './index.html', './manifest.json', './icon.svg', './kimpton-logo.svg'];
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
