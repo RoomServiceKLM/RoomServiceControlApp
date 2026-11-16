@@ -31,6 +31,7 @@ input{font-family:inherit}
 @keyframes shimmer{0%,100%{opacity:.45}50%{opacity:.9}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .skeleton{background:var(--panel2);animation:shimmer 1.4s ease-in-out infinite;border-radius:6px}
+/* header */
 header{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--border);background:rgba(10,13,19,.95);backdrop-filter:blur(8px)}
 .hwrap{max-width:1600px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 16px}
 .brand{display:flex;align-items:center;gap:12px}
@@ -47,6 +48,7 @@ header{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--border);ba
 .staff-btn{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);padding:10px 12px;transition:color .15s}
 .staff-btn:hover{color:var(--text)}
 .updated{max-width:1600px;margin:0 auto;padding:0 16px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(139,148,163,.7)}
+/* layout */
 main{max-width:1600px;margin:0 auto;padding:20px 16px}
 .grid{display:grid;grid-template-columns:1fr;gap:24px}
 @media(min-width:768px){.grid{grid-template-columns:repeat(2,1fr)}.search{width:224px}}
@@ -56,6 +58,7 @@ main{max-width:1600px;margin:0 auto;padding:20px 16px}
 .col-count{font-family:'JetBrains Mono',monospace;background:var(--panel2);border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700}
 .col-body{display:flex;flex-direction:column;gap:12px}
 .empty{border:1px dashed var(--border);border-radius:8px;padding:32px 16px;text-align:center;font-size:12px;color:var(--muted)}
+/* cards */
 .card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:left;width:100%;color:var(--text);transition:border-color .15s,transform .1s}
 .card:hover{border-color:#2b3a4f}
 .card:active{transform:scale(.99)}
@@ -69,10 +72,12 @@ main{max-width:1600px;margin:0 auto;padding:20px 16px}
 .badge{display:inline-flex;align-items:center;gap:6px;border-radius:4px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .badge i{width:6px;height:6px;border-radius:50%;display:inline-block}
 .urgent{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--red);margin-top:8px}
+/* error banner */
 .err-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.1);border-radius:8px;padding:12px 16px;margin-bottom:20px}
 .err-banner p{font-size:14px;color:var(--red)}
 .retry-btn{background:rgba(248,113,113,.2);color:var(--red);border:none;border-radius:6px;padding:8px 16px;font-size:14px;font-weight:600}
 .retry-btn:hover{background:rgba(248,113,113,.3)}
+/* login */
 .login-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
 .login-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:32px;width:100%;max-width:384px}
 .login-card h1{font-size:24px;font-weight:700;margin-top:8px}
@@ -81,6 +86,7 @@ main{max-width:1600px;margin:0 auto;padding:20px 16px}
 .login-input:focus{border-color:var(--amber);outline:none}
 .btn-primary{width:100%;background:var(--amber);color:var(--bg);border:none;border-radius:6px;padding:12px 16px;font-size:14px;font-weight:700;margin-top:12px;transition:opacity .15s}
 .btn-primary:hover{opacity:.9}
+/* drawer */
 .overlay{position:fixed;inset:0;z-index:40;display:flex;justify-content:flex-end}
 .overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);border:none;cursor:pointer}
 .drawer{position:relative;z-index:10;background:var(--panel);border-left:1px solid var(--border);width:100%;max-width:448px;height:100%;overflow-y:auto;display:flex;flex-direction:column}
@@ -128,10 +134,26 @@ main{max-width:1600px;margin:0 auto;padding:20px 16px}
 <script>
 const API_URL='https://roomservice-operations-api.roomservicekimptonlosmonteros.workers.dev/';
 const STAFF_KEY='rs_staff_name';
+const TOKEN_KEY='rs_session_token';
+const USER_KEY='rs_user_id';
 const REFRESH_MS=20000;
-const ST={NEW:{label:'Nueva',color:'#f87171',bg:'rgba(248,113,113,.12)'},IN_KITCHEN:{label:'En cocina',color:'#f8ac00',bg:'rgba(248,172,0,.12)'},DELIVERED:{label:'Entregada',color:'#34d399',bg:'rgba(52,211,153,.12)'},CANCELLED:{label:'Cancelada',color:'#8b94a3',bg:'rgba(139,148,163,.12)'}};
-const PK={NOT_REQUIRED:{label:'Sin recogida',color:'#8b94a3',bg:'rgba(139,148,163,.1)'},PENDING:{label:'Recogida pendiente',color:'#a78bfa',bg:'rgba(167,139,250,.12)'},REQUESTED:{label:'Recogida solicitada',color:'#22d3ee',bg:'rgba(34,211,238,.12)'},ON_THE_WAY:{label:'En camino',color:'#22d3ee',bg:'rgba(34,211,238,.12)'},COMPLETED:{label:'Recogida completada',color:'#34d399',bg:'rgba(52,211,153,.12)'}};
+const ST={
+ NEW:{label:'Nueva',color:'#f87171',bg:'rgba(248,113,113,.12)'},
+ IN_KITCHEN:{label:'En cocina',color:'#f8ac00',bg:'rgba(248,172,0,.12)'},
+ DELIVERED:{label:'Entregada',color:'#34d399',bg:'rgba(52,211,153,.12)'},
+ CANCELLED:{label:'Cancelada',color:'#8b94a3',bg:'rgba(139,148,163,.12)'}
+};
+const PK={
+ NOT_REQUIRED:{label:'Sin recogida',color:'#8b94a3',bg:'rgba(139,148,163,.1)'},
+ PENDING:{label:'Recogida pendiente',color:'#a78bfa',bg:'rgba(167,139,250,.12)'},
+ REQUESTED:{label:'Recogida solicitada',color:'#22d3ee',bg:'rgba(34,211,238,.12)'},
+ ON_THE_WAY:{label:'En camino',color:'#22d3ee',bg:'rgba(34,211,238,.12)'},
+ COMPLETED:{label:'Recogida completada',color:'#34d399',bg:'rgba(52,211,153,.12)'}
+};
 let staffName=localStorage.getItem(STAFF_KEY)||'';
+let sessionToken=localStorage.getItem(TOKEN_KEY)||'';
+let userId=localStorage.getItem(USER_KEY)||'';
+let users=[],usersLoading=false,usersLoaded=false,loginError='';
 let orders=[],counts=null,loading=true,error='',updatedAt='',selectedId=null,search='',refreshing=false;
 let detail=null,detailLoading=false,detailError='',actionError='',busy='',deliveryType='TRAY';
 let refreshTimer=null,clockTimer=null,dashboardInFlight=false;
@@ -146,12 +168,33 @@ async function api(action,payload={}){
  const timeoutMs=action==='dashboard'?90000:20000;
  const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),timeoutMs);
  try{
-  const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,sessionToken:'DUMMY',...payload}),signal:ctrl.signal});
+  const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,sessionToken,...payload}),signal:ctrl.signal});
   if(!res.ok)throw new Error('Error de red ('+res.status+')');
   const data=await res.json();
   if(data&&data.ok===false)throw new Error(data.error||'Error del servidor');
   return data;
- }catch(e){if(e.name==='AbortError')throw new Error('La conexión tarda demasiado. Inténtalo de nuevo.');throw e;}finally{clearTimeout(t);}
+ }catch(e){
+  if(e.name==='AbortError')throw new Error('La conexión tarda demasiado. Inténtalo de nuevo.');
+  throw e;
+ }finally{clearTimeout(t);}
+}
+async function loadUsers(){
+ try{
+  const res=await fetch(API_URL+'?action=users&_='+Date.now(),{cache:'no-store'});
+  const data=await res.json();
+  if(!res.ok||!data.ok)throw new Error(data.error||'No se pudieron cargar los usuarios');
+  users=data.users||[];loginError='';
+ }catch(e){loginError=e.message||'No se pudieron cargar los usuarios';}
+ finally{usersLoaded=true;}
+}
+function clearSession(){
+ localStorage.removeItem(STAFF_KEY);localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(USER_KEY);
+ staffName='';sessionToken='';userId='';selectedId=null;detail=null;
+}
+function authFailed(e){return /sesi[oó]n no v[aá]lida|sesi[oó]n ha caducado/i.test(String(e&&e.message||e||''));}
+async function logout(){
+ if(sessionToken){try{await api('logout');}catch(e){}}
+ clearInterval(refreshTimer);clearInterval(clockTimer);clearSession();render();
 }
 async function loadDashboard(silent=false){
  if(dashboardInFlight)return;
@@ -159,58 +202,220 @@ async function loadDashboard(silent=false){
  if(!silent){refreshing=true;renderHeader();}
  try{
   let res;
-  try{res=await api('dashboardLite');}catch(e){if(!String(e.message||'').includes('Acción POST no reconocida'))throw e;res=await api('dashboard');}
+  try{
+   res=await api('dashboardLite');
+  }catch(e){
+   if(!String(e.message||'').includes('Acción POST no reconocida'))throw e;
+   res=await api('dashboard');
+  }
   orders=res.orders||[];counts=res.counts||null;updatedAt=res.generatedAt||new Date().toISOString();error='';
- }catch(e){error=e.message||'Error de conexión';}
+ }catch(e){
+  if(authFailed(e)){clearInterval(refreshTimer);clearInterval(clockTimer);clearSession();render();return;}
+  error=e.message||'Error de conexión';
+ }
  finally{dashboardInFlight=false;loading=false;refreshing=false;renderHeader();renderMain();}
 }
 async function loadDetail(){
  detailLoading=true;detailError='';renderDrawer();
- try{const res=await api('order',{orderId:selectedId});detail=res.order;}
- catch(e){const cached=orders.find(o=>String(o.orderId)===String(selectedId));if(String(e.message||'').includes('Acción POST no reconocida')&&cached&&Array.isArray(cached.items))detail=cached;else detailError=e.message||'No se pudo cargar el detalle';}
+ try{
+  const res=await api('order',{orderId:selectedId});detail=res.order;
+ }catch(e){
+  const cached=orders.find(o=>String(o.orderId)===String(selectedId));
+  if(String(e.message||'').includes('Acción POST no reconocida')&&cached&&Array.isArray(cached.items))detail=cached;
+  else detailError=e.message||'No se pudo cargar el detalle';
+ }
  finally{detailLoading=false;renderDrawer();}
 }
-async function runAction(key,fn){busy=key;actionError='';renderDrawer();try{await fn();await loadDetail();loadDashboard(true);}catch(e){actionError=e.message||'La acción no se pudo completar';}finally{busy='';renderDrawer();}}
-function badge(type,map){const s=map[type]||map.NEW||Object.values(map)[0];return `<span class="badge" style="color:${s.color};background:${s.bg}"><i style="background:${s.color}"></i>${s.label}</span>`;}
-function cardHTML(o){
- const urgent=o.orderStatus==='NEW'&&elapsedMin(o.createdAt)>15;const showPickup=['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus);
- return `<button type="button" class="card ${selectedId===o.orderId?'selected':''}" data-order="${esc(o.orderId)}" aria-pressed="${selectedId===o.orderId}" ${urgent?'style="border-color:rgba(248,113,113,.5)"':''}><div class="card-top"><div style="display:flex;align-items:baseline;gap:12px;min-width:0"><span class="room">${esc(o.room)}</span><div style="min-width:0"><p class="guest-name">${esc(o.guest||'Sin nombre')}</p><p class="card-meta">${fmtTime(o.createdAt)} · hace ${fmtElapsed(o.createdAt)}</p></div></div><span class="total">${money(o.total)}</span></div><div class="badges">${badge(o.orderStatus,ST)}${showPickup?badge(o.pickupStatus,PK):''}${o.assignedTo?`<span class="badge" style="color:var(--muted);background:var(--panel2)">${esc(o.assignedTo)}</span>`:''}</div>${urgent?'<p class="urgent">Lleva más de 15 min sin entrar en cocina</p>':''}</button>`;
+async function runAction(key,fn){
+ busy=key;actionError='';renderDrawer();
+ try{await fn();await loadDetail();loadDashboard(true);}
+ catch(e){
+  if(authFailed(e)){clearInterval(refreshTimer);clearInterval(clockTimer);clearSession();render();return;}
+  actionError=e.message||'La acción no se pudo completar';
+ }
+ finally{busy='';renderDrawer();}
 }
-function columnHTML(title,color,count,items,emptyText){return `<section><div class="col-header"><h2 class="col-title" style="color:${color}">${title}</h2><span class="col-count">${count}</span></div><div class="col-body">${items.length?items.map(cardHTML).join(''):`<div class="empty">${emptyText}</div>`}</div></section>`;}
-function filteredOrders(){const t=search.trim().toLowerCase();if(!t)return orders;return orders.filter(o=>String(o.room).includes(t)||(o.guest||'').toLowerCase().includes(t));}
+function badge(type,map){const s=map[type]||map.NEW||Object.values(map)[0];
+ return `<span class="badge" style="color:${s.color};background:${s.bg}"><i style="background:${s.color}"></i>${s.label}</span>`;}
+function cardHTML(o){
+ const urgent=o.orderStatus==='NEW'&&elapsedMin(o.createdAt)>15;
+ const showPickup=['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus);
+ return `<button type="button" class="card ${selectedId===o.orderId?'selected':''}" data-order="${esc(o.orderId)}" aria-pressed="${selectedId===o.orderId}" ${urgent?'style="border-color:rgba(248,113,113,.5)"':''}>
+  <div class="card-top">
+   <div style="display:flex;align-items:baseline;gap:12px;min-width:0">
+    <span class="room">${esc(o.room)}</span>
+    <div style="min-width:0"><p class="guest-name">${esc(o.guest||'Sin nombre')}</p>
+    <p class="card-meta">${fmtTime(o.createdAt)} · hace ${fmtElapsed(o.createdAt)}</p></div>
+   </div>
+   <span class="total">${money(o.total)}</span>
+  </div>
+  <div class="badges">${badge(o.orderStatus,ST)}${showPickup?badge(o.pickupStatus,PK):''}${o.assignedTo?`<span class="badge" style="color:var(--muted);background:var(--panel2)">${esc(o.assignedTo)}</span>`:''}</div>
+  ${urgent?'<p class="urgent">Lleva más de 15 min sin entrar en cocina</p>':''}
+ </button>`;
+}
+function columnHTML(title,color,count,items,emptyText){
+ return `<section><div class="col-header"><h2 class="col-title" style="color:${color}">${title}</h2><span class="col-count">${count}</span></div>
+ <div class="col-body">${items.length?items.map(cardHTML).join(''):`<div class="empty">${emptyText}</div>`}</div></section>`;
+}
+function filteredOrders(){
+ const t=search.trim().toLowerCase();
+ if(!t)return orders;
+ return orders.filter(o=>String(o.room).includes(t)||(o.guest||'').toLowerCase().includes(t));
+}
 function renderHeader(){
  const el=$('header-slot');if(!el)return;
- el.innerHTML=`<header><div class="hwrap"><div class="brand"><span class="brand-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0d13" stroke-width="2.2" stroke-linecap="round"><path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 10V7"/><circle cx="12" cy="5.5" r="1" fill="#0a0d13" stroke="none"/></svg></span><div><p class="label" style="letter-spacing:.2em;font-size:9px">Kimpton Los Monteros</p><h1 style="font-size:14px;font-weight:700;line-height:1.2">Room Service Control</h1></div></div><div class="live-badge"><span class="${error?'dot-off':'dot-live'}"></span><span class="txt">${error?'Sin conexión':'En vivo'}</span></div><span class="clock" style="display:none" id="clock">${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</span><div class="hactions"><input class="search" id="search-input" placeholder="Buscar habitación o huésped" aria-label="Buscar comandas" value="${esc(search)}"><button type="button" class="icon-btn" id="refresh-btn" aria-label="Actualizar ahora" title="Actualizar ahora" ${refreshing?'disabled':''}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ${refreshing?'style="animation:spin 1s linear infinite"':''}><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg></button><button type="button" class="staff-btn" id="staff-btn" title="Cambiar de usuario">${esc(staffName)}</button></div></div>${updatedAt&&!error?`<p class="updated">Actualizado ${fmtTime(updatedAt)} · auto cada 20 s</p>`:''}</header>`;
- $('refresh-btn').onclick=()=>loadDashboard();$('staff-btn').onclick=()=>{if(confirm('¿Cambiar de usuario?')){localStorage.removeItem(STAFF_KEY);staffName='';selectedId=null;clearInterval(refreshTimer);render();}};
- const si=$('search-input');si.oninput=e=>{search=e.target.value;renderMain();};si.onfocus=()=>{const v=si.value;si.value='';si.value=v;};if(window.innerWidth>=640)$('clock').style.display='inline';
+ el.innerHTML=`<header><div class="hwrap">
+  <div class="brand"><span class="brand-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0d13" stroke-width="2.2" stroke-linecap="round"><path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 10V7"/><circle cx="12" cy="5.5" r="1" fill="#0a0d13" stroke="none"/></svg></span>
+  <div><p class="label" style="letter-spacing:.2em;font-size:9px">Kimpton Los Monteros</p><h1 style="font-size:14px;font-weight:700;line-height:1.2">Room Service Control</h1></div></div>
+  <div class="live-badge"><span class="${error?'dot-off':'dot-live'}"></span><span class="txt">${error?'Sin conexión':'En vivo'}</span></div>
+  <span class="clock" style="display:none" id="clock">${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</span>
+  <div class="hactions">
+   <input class="search" id="search-input" placeholder="Buscar habitación o huésped" aria-label="Buscar comandas" value="${esc(search)}">
+   <button type="button" class="icon-btn" id="refresh-btn" aria-label="Actualizar ahora" title="Actualizar ahora" ${refreshing?'disabled':''}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ${refreshing?'style="animation:spin 1s linear infinite"':''}><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+   </button>
+   <button type="button" class="staff-btn" id="staff-btn" title="Cerrar sesión">${esc(staffName)}</button>
+  </div></div>
+  ${updatedAt&&!error?`<p class="updated">Actualizado ${fmtTime(updatedAt)} · auto cada 20 s</p>`:''}
+ </header>`;
+ $('refresh-btn').onclick=()=>loadDashboard();
+ $('staff-btn').onclick=()=>{if(confirm('¿Cerrar la sesión de '+staffName+'?'))logout();};
+ const si=$('search-input');
+ si.oninput=e=>{search=e.target.value;renderMain();};
+ si.onfocus=()=>{const v=si.value;si.value='';si.value=v;};
+ if(window.innerWidth>=640)$('clock').style.display='inline';
 }
 function renderMain(){
  const el=$('main-slot');if(!el)return;
- if(loading){el.innerHTML=`<main><div class="grid">${[0,1,2,3].map(()=>`<div><div class="skeleton" style="height:20px;width:128px;margin-bottom:12px"></div><div class="skeleton" style="height:112px;margin-bottom:12px"></div><div class="skeleton" style="height:112px"></div></div>`).join('')}</div></main>`;return;}
- const f=filteredOrders(),news=f.filter(o=>o.orderStatus==='NEW'),kitchen=f.filter(o=>o.orderStatus==='IN_KITCHEN'),pickups=f.filter(o=>o.orderStatus==='DELIVERED'&&['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus)),delivered=f.filter(o=>o.orderStatus==='DELIVERED'&&!['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus));
- el.innerHTML=`<main>${error?`<div class="err-banner"><p>${esc(error)}</p><button type="button" class="retry-btn" id="retry-btn">Reintentar</button></div>`:''}<div class="grid">${columnHTML('Nuevas','#f87171',counts?.new??news.length,news,'Sin comandas nuevas')}${columnHTML('En cocina','#f8ac00',counts?.inKitchen??kitchen.length,kitchen,'Nada en preparación')}${columnHTML('Recogidas','#22d3ee',pickups.length,pickups,'Sin recogidas pendientes')}${columnHTML('Entregadas','#34d399',delivered.length,delivered,'Ninguna entregada todavía')}</div></main>`;
- if($('retry-btn'))$('retry-btn').onclick=()=>loadDashboard();document.querySelectorAll('[data-order]').forEach(b=>{b.onclick=()=>{selectedId=b.dataset.order;detail=null;actionError='';deliveryType='TRAY';renderMain();renderDrawer();loadDetail();};});
+ if(loading){
+  el.innerHTML=`<main><div class="grid">${[0,1,2,3].map(()=>`<div><div class="skeleton" style="height:20px;width:128px;margin-bottom:12px"></div><div class="skeleton" style="height:112px;margin-bottom:12px"></div><div class="skeleton" style="height:112px"></div></div>`).join('')}</div></main>`;
+  return;
+ }
+ const f=filteredOrders();
+ const news=f.filter(o=>o.orderStatus==='NEW');
+ const kitchen=f.filter(o=>o.orderStatus==='IN_KITCHEN');
+ const pickups=f.filter(o=>o.orderStatus==='DELIVERED'&&['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus));
+ const delivered=f.filter(o=>o.orderStatus==='DELIVERED'&&!['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus));
+ el.innerHTML=`<main>
+ ${error?`<div class="err-banner"><p>${esc(error)}</p><button type="button" class="retry-btn" id="retry-btn">Reintentar</button></div>`:''}
+ <div class="grid">
+  ${columnHTML('Nuevas','#f87171',counts?.new??news.length,news,'Sin comandas nuevas')}
+  ${columnHTML('En cocina','#f8ac00',counts?.inKitchen??kitchen.length,kitchen,'Nada en preparación')}
+  ${columnHTML('Recogidas','#22d3ee',pickups.length,pickups,'Sin recogidas pendientes')}
+  ${columnHTML('Entregadas','#34d399',delivered.length,delivered,'Ninguna entregada todavía')}
+ </div></main>`;
+ if($('retry-btn'))$('retry-btn').onclick=()=>loadDashboard();
+ document.querySelectorAll('[data-order]').forEach(b=>{
+  b.onclick=()=>{selectedId=b.dataset.order;detail=null;actionError='';deliveryType='TRAY';renderMain();renderDrawer();loadDetail();};
+ });
 }
 function renderDrawer(){
- const el=$('drawer-slot');if(!el)return;if(!selectedId){el.innerHTML='';return;}let body='';
- if(detailLoading)body=`<div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:128px"></div><div class="skeleton" style="height:96px"></div>`;
- else if(detailError)body=`<div class="empty" style="border-color:rgba(248,113,113,.4)"><p style="color:var(--red);font-size:14px">${esc(detailError)}</p><button type="button" class="retry-btn" id="detail-retry" style="margin-top:12px">Reintentar</button></div>`;
+ const el=$('drawer-slot');if(!el)return;
+ if(!selectedId){el.innerHTML='';return;}
+ let body='';
+ if(detailLoading){body=`<div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:128px"></div><div class="skeleton" style="height:96px"></div>`;}
+ else if(detailError){body=`<div class="empty" style="border-color:rgba(248,113,113,.4)"><p style="color:var(--red);font-size:14px">${esc(detailError)}</p><button type="button" class="retry-btn" id="detail-retry" style="margin-top:12px">Reintentar</button></div>`;}
  else if(detail){
-  const o=detail,lp=o.pickups&&o.pickups.length?o.pickups[o.pickups.length-1]:null;
-  body=`<section><div class="d-row"><span class="d-room">Hab. ${esc(o.room)}</span><span class="d-total">${money(o.total)}</span></div><p class="d-sub">${esc(o.guest)} · ${o.pax} pax</p><p class="d-meta">${fmtDate(o.createdAt)} ${fmtTime(o.createdAt)} · ${esc(o.service)}</p><div class="badges">${badge(o.orderStatus,ST)}${o.pickupStatus!=='NOT_REQUIRED'?badge(o.pickupStatus,PK):''}</div></section>${o.allergy==='Sí'?`<section class="alert-box"><p class="label">Alergias</p><p class="val">${esc(o.allergyDetail||'Declaradas sin detalle')}</p></section>`:''}<section><p class="label">Productos</p><ul class="items-list">${o.items.map(it=>`<li><div><p class="item-name"><span class="qty">${it.quantity}×</span>${esc(it.nameEs)}</p>${it.variantEs?`<p class="item-variant">${esc(it.variantEs)}</p>`:''}${it.notes?`<p class="item-variant">${esc(it.notes)}</p>`:''}</div><span class="item-price">${money(it.subtotal)}</span></li>`).join('')}</ul><div class="totals"><div class="t-row"><span>Subtotal</span><span class="mono">${money(o.subtotal)}</span></div><div class="t-row"><span>Delivery</span><span class="mono">${money(o.deliveryCharge)}</span></div><div class="t-row grand"><span>Total</span><span class="mono">${money(o.total)}</span></div><p class="pay-note">Pago: ${esc(o.payment)}${o.cashAmount?` · Efectivo: ${esc(o.cashAmount)} €`:''}</p></div></section>${o.notes?`<section><p class="label" style="margin-bottom:4px">Notas</p><p style="font-size:14px">${esc(o.notes)}</p></section>`:''}${lp&&['REQUESTED','ON_THE_WAY','COMPLETED'].includes(lp.pickupStatus)?`<section class="pickup-box"><p class="label">Recogida</p><p style="font-size:14px;margin-top:4px">${lp.location==='OUTSIDE_DOOR'?'Fuera de la puerta':'Dentro de la habitación'}${lp.guestName?' · '+esc(lp.guestName):''}</p>${lp.guestNotes?`<p style="font-size:12px;color:var(--muted);margin-top:4px">${esc(lp.guestNotes)}</p>`:''}${lp.requestedAt?`<p class="d-meta">Solicitada: ${fmtTime(lp.requestedAt)}</p>`:''}</section>`:''}${actionError?`<p class="action-err">${esc(actionError)}</p>`:''}<section class="actions">${o.orderStatus==='NEW'?`<button type="button" class="btn-primary" id="act-cook" ${busy?'disabled':''}>${busy==='cook'?'Procesando…':'Marchando en cocina'}</button>`:''}${o.orderStatus==='IN_KITCHEN'?`<p class="label">Entregar como</p><div class="type-grid"><button type="button" class="type-btn ${deliveryType==='TRAY'?'active':''}" id="type-tray" aria-pressed="${deliveryType==='TRAY'}">Bandeja</button><button type="button" class="type-btn ${deliveryType==='TROLLEY'?'active':''}" id="type-trolley" aria-pressed="${deliveryType==='TROLLEY'}">Mesa / carro</button></div><button type="button" class="btn-green" id="act-deliver" ${busy?'disabled':''}>${busy==='deliver'?'Procesando…':'Marcar entregado'}</button>`:''}${lp&&lp.pickupStatus==='REQUESTED'?`<button type="button" class="btn-cyan" id="act-way" ${busy?'disabled':''}>${busy==='way'?'Procesando…':'Recogida en camino'}</button>`:''}${lp&&['REQUESTED','ON_THE_WAY'].includes(lp.pickupStatus)?`<button type="button" class="btn-outline" id="act-done" ${busy?'disabled':''}>${busy==='done'?'Procesando…':'Recogida completada'}</button>`:''}</section>`;
+  const o=detail;
+  const lp=o.pickups&&o.pickups.length?o.pickups[o.pickups.length-1]:null;
+  body=`
+  <section><div class="d-row"><span class="d-room">Hab. ${esc(o.room)}</span><span class="d-total">${money(o.total)}</span></div>
+   <p class="d-sub">${esc(o.guest)} · ${o.pax} pax</p>
+   <p class="d-meta">${fmtDate(o.createdAt)} ${fmtTime(o.createdAt)} · ${esc(o.service)}</p>
+   <div class="badges">${badge(o.orderStatus,ST)}${o.pickupStatus!=='NOT_REQUIRED'?badge(o.pickupStatus,PK):''}</div></section>
+  ${o.allergy==='Sí'?`<section class="alert-box"><p class="label">Alergias</p><p class="val">${esc(o.allergyDetail||'Declaradas sin detalle')}</p></section>`:''}
+  <section><p class="label">Productos</p><ul class="items-list">
+   ${o.items.map(it=>`<li><div><p class="item-name"><span class="qty">${it.quantity}×</span>${esc(it.nameEs)}</p>${it.variantEs?`<p class="item-variant">${esc(it.variantEs)}</p>`:''}${it.notes?`<p class="item-variant">${esc(it.notes)}</p>`:''}</div><span class="item-price">${money(it.subtotal)}</span></li>`).join('')}
+  </ul>
+  <div class="totals"><div class="t-row"><span>Subtotal</span><span class="mono">${money(o.subtotal)}</span></div>
+   <div class="t-row"><span>Delivery</span><span class="mono">${money(o.deliveryCharge)}</span></div>
+   <div class="t-row grand"><span>Total</span><span class="mono">${money(o.total)}</span></div>
+   <p class="pay-note">Pago: ${esc(o.payment)}${o.cashAmount?` · Efectivo: ${esc(o.cashAmount)} €`:''}</p></div></section>
+  ${o.notes?`<section><p class="label" style="margin-bottom:4px">Notas</p><p style="font-size:14px">${esc(o.notes)}</p></section>`:''}
+  ${lp&&['REQUESTED','ON_THE_WAY','COMPLETED'].includes(lp.pickupStatus)?`<section class="pickup-box"><p class="label">Recogida</p>
+   <p style="font-size:14px;margin-top:4px">${lp.location==='OUTSIDE_DOOR'?'Fuera de la puerta':'Dentro de la habitación'}${lp.guestName?' · '+esc(lp.guestName):''}</p>
+   ${lp.guestNotes?`<p style="font-size:12px;color:var(--muted);margin-top:4px">${esc(lp.guestNotes)}</p>`:''}
+   ${lp.requestedAt?`<p class="d-meta">Solicitada: ${fmtTime(lp.requestedAt)}</p>`:''}</section>`:''}
+  ${actionError?`<p class="action-err">${esc(actionError)}</p>`:''}
+  <section class="actions">
+   ${o.orderStatus==='NEW'?`<button type="button" class="btn-primary" id="act-cook" ${busy?'disabled':''}>${busy==='cook'?'Procesando…':'Marchando en cocina'}</button>`:''}
+   ${o.orderStatus==='IN_KITCHEN'?`<p class="label">Entregar como</p>
+    <div class="type-grid">
+     <button type="button" class="type-btn ${deliveryType==='TRAY'?'active':''}" id="type-tray" aria-pressed="${deliveryType==='TRAY'}">Bandeja</button>
+     <button type="button" class="type-btn ${deliveryType==='TROLLEY'?'active':''}" id="type-trolley" aria-pressed="${deliveryType==='TROLLEY'}">Mesa / carro</button>
+    </div>
+    <button type="button" class="btn-green" id="act-deliver" ${busy?'disabled':''}>${busy==='deliver'?'Procesando…':'Marcar entregado'}</button>`:''}
+   ${lp&&lp.pickupStatus==='REQUESTED'?`<button type="button" class="btn-cyan" id="act-way" ${busy?'disabled':''}>${busy==='way'?'Procesando…':'Recogida en camino'}</button>`:''}
+   ${lp&&['REQUESTED','ON_THE_WAY'].includes(lp.pickupStatus)?`<button type="button" class="btn-outline" id="act-done" ${busy?'disabled':''}>${busy==='done'?'Procesando…':'Recogida completada'}</button>`:''}
+  </section>`;
  }
- el.innerHTML=`<div class="overlay" role="dialog" aria-modal="true" aria-label="Detalle de comanda"><button type="button" class="overlay-bg" id="overlay-close" aria-label="Cerrar detalle"></button><aside class="drawer"><div class="drawer-header"><div><p class="label">Comanda</p><p class="mono" style="font-size:12px;color:var(--muted);margin-top:4px">${esc(selectedId)}</p></div><button type="button" class="icon-btn" id="drawer-close" aria-label="Cerrar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="drawer-body">${body}</div></aside></div>`;
- $('overlay-close').onclick=closeDrawer;$('drawer-close').onclick=closeDrawer;if($('detail-retry'))$('detail-retry').onclick=loadDetail;if($('act-cook'))$('act-cook').onclick=()=>runAction('cook',()=>api('startCooking',{orderId:selectedId,staffName}));if($('type-tray'))$('type-tray').onclick=()=>{deliveryType='TRAY';renderDrawer();};if($('type-trolley'))$('type-trolley').onclick=()=>{deliveryType='TROLLEY';renderDrawer();};if($('act-deliver'))$('act-deliver').onclick=()=>runAction('deliver',()=>api('selectDeliveryType',{orderId:selectedId,staffName,deliveryType}));if($('act-way')){const lp=detail.pickups[detail.pickups.length-1];$('act-way').onclick=()=>runAction('way',()=>api('pickupOnWay',{pickupId:lp.pickupId,staffName}));}if($('act-done')){const lp=detail.pickups[detail.pickups.length-1];$('act-done').onclick=()=>runAction('done',()=>api('completePickup',{pickupId:lp.pickupId,staffName}));}
+ el.innerHTML=`<div class="overlay" role="dialog" aria-modal="true" aria-label="Detalle de comanda">
+  <button type="button" class="overlay-bg" id="overlay-close" aria-label="Cerrar detalle"></button>
+  <aside class="drawer"><div class="drawer-header"><div><p class="label">Comanda</p><p class="mono" style="font-size:12px;color:var(--muted);margin-top:4px">${esc(selectedId)}</p></div>
+  <button type="button" class="icon-btn" id="drawer-close" aria-label="Cerrar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="drawer-body">${body}</div></aside></div>`;
+ $('overlay-close').onclick=closeDrawer;
+ $('drawer-close').onclick=closeDrawer;
+ if($('detail-retry'))$('detail-retry').onclick=loadDetail;
+ if($('act-cook'))$('act-cook').onclick=()=>runAction('cook',()=>api('startCooking',{orderId:selectedId,staffName}));
+ if($('type-tray'))$('type-tray').onclick=()=>{deliveryType='TRAY';renderDrawer();};
+ if($('type-trolley'))$('type-trolley').onclick=()=>{deliveryType='TROLLEY';renderDrawer();};
+ if($('act-deliver'))$('act-deliver').onclick=()=>runAction('deliver',()=>api('selectDeliveryType',{orderId:selectedId,staffName,deliveryType}));
+ if($('act-way')){const lp=detail.pickups[detail.pickups.length-1];$('act-way').onclick=()=>runAction('way',()=>api('pickupOnWay',{pickupId:lp.pickupId,staffName}));}
+ if($('act-done')){const lp=detail.pickups[detail.pickups.length-1];$('act-done').onclick=()=>runAction('done',()=>api('completePickup',{pickupId:lp.pickupId,staffName}));}
 }
 function closeDrawer(){selectedId=null;detail=null;renderDrawer();renderMain();}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selectedId)closeDrawer();});
 function render(){
- const app=$('app');if(!staffName){app.innerHTML=`<div class="login-wrap"><div class="login-card"><p class="label" style="color:var(--amber);letter-spacing:.2em">Kimpton Los Monteros</p><h1>Room Service Control</h1><p class="sub">Identifícate con tu nombre para registrar las acciones a tu cargo.</p><form id="login-form"><input class="login-input" id="login-input" placeholder="Tu nombre" autofocus maxlength="40" autocomplete="name"><button type="submit" class="btn-primary" id="login-submit" disabled>Entrar al panel</button></form></div></div>`;const inp=$('login-input'),btn=$('login-submit');inp.oninput=()=>{btn.disabled=!inp.value.trim();};$('login-form').onsubmit=e=>{e.preventDefault();const n=inp.value.trim();if(!n)return;localStorage.setItem(STAFF_KEY,n);staffName=n;startApp();};return;}
- app.innerHTML='<div id="header-slot"></div><div id="main-slot"></div><div id="drawer-slot"></div>';renderHeader();renderMain();renderDrawer();
+ const app=$('app');
+ if(!staffName||!sessionToken){
+  app.innerHTML=`<div class="login-wrap"><div class="login-card">
+   <p class="label" style="color:var(--amber);letter-spacing:.2em">Kimpton Los Monteros</p>
+   <h1>Room Service Control</h1>
+   <p class="sub">Selecciona tu usuario e introduce tu contraseña para registrar las acciones a tu cargo.</p>
+   <form id="login-form">
+    <select class="login-input" id="user-select" aria-label="Usuario" autocomplete="username" ${usersLoading?'disabled':''}>
+     <option value="">${usersLoading?'Cargando usuarios…':'Selecciona tu usuario'}</option>
+     ${users.map(u=>`<option value="${esc(u.userId)}" ${userId===String(u.userId)?'selected':''}>${esc(u.displayName)}</option>`).join('')}
+    </select>
+    <input class="login-input" id="password-input" type="password" placeholder="Contraseña" aria-label="Contraseña" autocomplete="current-password" style="margin-top:12px">
+    ${loginError?`<p class="action-err" style="margin-top:12px">${esc(loginError)}</p>`:''}
+    <button type="submit" class="btn-primary" id="login-submit" disabled>Entrar al panel</button>
+   </form>
+   ${usersLoaded&&!users.length?`<button type="button" class="retry-btn" id="users-retry" style="margin-top:12px;width:100%">Volver a cargar usuarios</button>`:''}
+  </div></div>`;
+  const sel=$('user-select'),pass=$('password-input'),btn=$('login-submit');
+  const update=()=>{btn.disabled=!sel.value||!pass.value;};
+  sel.onchange=()=>{userId=sel.value;update();};pass.oninput=update;
+  $('login-form').onsubmit=async e=>{
+   e.preventDefault();if(!sel.value||!pass.value)return;
+   btn.disabled=true;btn.textContent='Comprobando…';loginError='';
+   try{
+    const res=await api('login',{userId:sel.value,password:pass.value});
+    sessionToken=res.sessionToken;staffName=res.user.displayName;userId=res.user.userId;
+    localStorage.setItem(TOKEN_KEY,sessionToken);localStorage.setItem(STAFF_KEY,staffName);localStorage.setItem(USER_KEY,userId);
+    startApp();
+   }catch(err){loginError=err.message||'No se pudo iniciar sesión';render();}
+  };
+  if($('users-retry'))$('users-retry').onclick=()=>{usersLoaded=false;loginError='';render();};
+  if(!usersLoaded&&!usersLoading){
+   usersLoading=true;
+   loadUsers().finally(()=>{usersLoading=false;render();});
+  }
+  return;
+ }
+ app.innerHTML='<div id="header-slot"></div><div id="main-slot"></div><div id="drawer-slot"></div>';
+ renderHeader();renderMain();renderDrawer();
 }
-function startApp(){render();loading=true;loadDashboard();clearInterval(refreshTimer);refreshTimer=setInterval(()=>{if(!selectedId)loadDashboard(true);},REFRESH_MS);clearInterval(clockTimer);clockTimer=setInterval(()=>{const c=$('clock');if(c)c.textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});},30000);}
-if(staffName)startApp();else render();
-if('serviceWorker'in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+function startApp(){
+ render();loading=true;loadDashboard();
+ clearInterval(refreshTimer);
+ refreshTimer=setInterval(()=>{if(!selectedId)loadDashboard(true);},REFRESH_MS);
+ clearInterval(clockTimer);
+ clockTimer=setInterval(()=>{const c=$('clock');if(c)c.textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});},30000);
+}
+if(staffName&&sessionToken)startApp();else render();
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
 </script>
 </body>
 </html>
