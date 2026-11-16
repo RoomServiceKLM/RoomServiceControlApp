@@ -175,15 +175,26 @@ async function api(action,payload={}){
 async function loadDashboard(silent=false){
  if(!silent){refreshing=true;renderHeader();}
  try{
-  const res=await api('dashboardLite');
+  let res;
+  try{
+   res=await api('dashboardLite');
+  }catch(e){
+   if(!String(e.message||'').includes('Acción POST no reconocida'))throw e;
+   res=await api('dashboard');
+  }
   orders=res.orders||[];counts=res.counts||null;updatedAt=res.generatedAt||new Date().toISOString();error='';
  }catch(e){error=e.message||'Error de conexión';}
  finally{loading=false;refreshing=false;renderHeader();renderMain();}
 }
 async function loadDetail(){
  detailLoading=true;detailError='';renderDrawer();
- try{const res=await api('order',{orderId:selectedId});detail=res.order;}
- catch(e){detailError=e.message||'No se pudo cargar el detalle';}
+ try{
+  const res=await api('order',{orderId:selectedId});detail=res.order;
+ }catch(e){
+  const cached=orders.find(o=>String(o.orderId)===String(selectedId));
+  if(String(e.message||'').includes('Acción POST no reconocida')&&cached&&Array.isArray(cached.items))detail=cached;
+  else detailError=e.message||'No se pudo cargar el detalle';
+ }
  finally{detailLoading=false;renderDrawer();}
 }
 async function runAction(key,fn){
