@@ -153,7 +153,7 @@ const PK={
 let staffName=localStorage.getItem(STAFF_KEY)||'';
 let sessionToken=localStorage.getItem(TOKEN_KEY)||'';
 let userId=localStorage.getItem(USER_KEY)||'';
-let users=[],usersLoading=false,usersLoaded=false,loginError='';
+let loginError='';
 let orders=[],counts=null,loading=true,error='',updatedAt='',selectedId=null,search='',refreshing=false;
 let detail=null,detailLoading=false,detailError='',actionError='',busy='',deliveryType='TRAY';
 let refreshTimer=null,clockTimer=null,dashboardInFlight=false;
@@ -177,15 +177,6 @@ async function api(action,payload={}){
   if(e.name==='AbortError')throw new Error('La conexión tarda demasiado. Inténtalo de nuevo.');
   throw e;
  }finally{clearTimeout(t);}
-}
-async function loadUsers(){
- try{
-  const res=await fetch(API_URL+'?action=users&_='+Date.now(),{cache:'no-store'});
-  const data=await res.json();
-  if(!res.ok||!data.ok)throw new Error(data.error||'No se pudieron cargar los usuarios');
-  users=data.users||[];loginError='';
- }catch(e){loginError=e.message||'No se pudieron cargar los usuarios';}
- finally{usersLoaded=true;}
 }
 function clearSession(){
  localStorage.removeItem(STAFF_KEY);localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(USER_KEY);
@@ -372,36 +363,27 @@ function render(){
   app.innerHTML=`<div class="login-wrap"><div class="login-card">
    <p class="label" style="color:var(--amber);letter-spacing:.2em">Kimpton Los Monteros</p>
    <h1>Room Service Control</h1>
-   <p class="sub">Selecciona tu usuario e introduce tu contraseña para registrar las acciones a tu cargo.</p>
+   <p class="sub">Introduce tu ID de usuario y tu contraseña para registrar las acciones a tu cargo.</p>
    <form id="login-form">
-    <select class="login-input" id="user-select" aria-label="Usuario" autocomplete="username" ${usersLoading?'disabled':''}>
-     <option value="">${usersLoading?'Cargando usuarios…':'Selecciona tu usuario'}</option>
-     ${users.map(u=>`<option value="${esc(u.userId)}" ${userId===String(u.userId)?'selected':''}>${esc(u.displayName)}</option>`).join('')}
-    </select>
+    <input class="login-input" id="user-input" type="text" placeholder="ID de usuario (USR-…)" aria-label="ID de usuario" autocomplete="username" autocapitalize="characters" spellcheck="false" value="${esc(userId)}">
     <input class="login-input" id="password-input" type="password" placeholder="Contraseña" aria-label="Contraseña" autocomplete="current-password" style="margin-top:12px">
     ${loginError?`<p class="action-err" style="margin-top:12px">${esc(loginError)}</p>`:''}
     <button type="submit" class="btn-primary" id="login-submit" disabled>Entrar al panel</button>
    </form>
-   ${usersLoaded&&!users.length?`<button type="button" class="retry-btn" id="users-retry" style="margin-top:12px;width:100%">Volver a cargar usuarios</button>`:''}
   </div></div>`;
-  const sel=$('user-select'),pass=$('password-input'),btn=$('login-submit');
-  const update=()=>{btn.disabled=!sel.value||!pass.value;};
-  sel.onchange=()=>{userId=sel.value;update();};pass.oninput=update;
+  const sel=$('user-input'),pass=$('password-input'),btn=$('login-submit');
+  const update=()=>{btn.disabled=!sel.value.trim()||!pass.value;};
+  sel.oninput=()=>{userId=sel.value.trim();update();};pass.oninput=update;
   $('login-form').onsubmit=async e=>{
-   e.preventDefault();if(!sel.value||!pass.value)return;
+   e.preventDefault();if(!sel.value.trim()||!pass.value)return;
    btn.disabled=true;btn.textContent='Comprobando…';loginError='';
    try{
-    const res=await api('login',{userId:sel.value,password:pass.value});
+    const res=await api('login',{userId:sel.value.trim(),password:pass.value});
     sessionToken=res.sessionToken;staffName=res.user.displayName;userId=res.user.userId;
     localStorage.setItem(TOKEN_KEY,sessionToken);localStorage.setItem(STAFF_KEY,staffName);localStorage.setItem(USER_KEY,userId);
     startApp();
    }catch(err){loginError=err.message||'No se pudo iniciar sesión';render();}
   };
-  if($('users-retry'))$('users-retry').onclick=()=>{usersLoaded=false;loginError='';render();};
-  if(!usersLoaded&&!usersLoading){
-   usersLoading=true;
-   loadUsers().finally(()=>{usersLoading=false;render();});
-  }
   return;
  }
  app.innerHTML='<div id="header-slot"></div><div id="main-slot"></div><div id="drawer-slot"></div>';
