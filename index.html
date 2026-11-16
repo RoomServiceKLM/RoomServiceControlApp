@@ -160,7 +160,8 @@ function elapsedMin(iso){if(!iso)return 0;const d=new Date(iso);return isNaN(d)?
 function fmtElapsed(iso){const m=elapsedMin(iso);if(m<1)return'ahora';if(m<60)return m+' min';const h=Math.floor(m/60),r=m%60;return r?h+'h '+r+'m':h+'h';}
 function money(n){return Number(n||0).toFixed(2)+' €';}
 async function api(action,payload={}){
- const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),20000);
+ const timeoutMs=action==='dashboard'?90000:20000;
+ const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),timeoutMs);
  try{
   const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,sessionToken:'DUMMY',...payload}),signal:ctrl.signal});
   if(!res.ok)throw new Error('Error de red ('+res.status+')');
