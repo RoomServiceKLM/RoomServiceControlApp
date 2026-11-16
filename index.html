@@ -1,132 +1,354 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f8ac00">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Room Service Control</title>
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./icon.svg">
-  <style>
-    :root{--yellow:#f8ac00;--mustard:#d99100;--sand:#f3dfb2;--pale:#fff2cf;--white:#fff;--black:#171717;--cream:#fbf6eb;--card:var(--white);--text:var(--black);--muted:#6f675b;--red:#c97b2b;--green:#8b9456;--orange:#d99100;--blue:#b98218;--line:#e8dcc4;--shadow:0 8px 28px rgba(23,23,23,.10)}
-    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
-    button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display:none!important}
-    .login{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--yellow)}
-    .login-card{width:min(440px,100%);background:var(--white);border:2px solid var(--white);border-radius:26px;padding:32px;box-shadow:0 28px 70px rgba(23,23,23,.22)}
-    .brand{display:block;text-align:center}.kimpton-logo{display:block;width:min(310px,90%);height:auto;margin:0 auto 22px}.login-card .kimpton-logo{background:var(--yellow);border-radius:18px;padding:16px 20px}.brand h1{font-size:23px;margin:0}.brand p{margin:7px 0 0;color:var(--muted)}
-    .field{margin-top:20px}.field label{display:block;font-weight:750;margin-bottom:9px}.field input,.field select,.field textarea{width:100%;padding:14px;border:2px solid var(--line);border-radius:13px;background:var(--white);color:var(--black)}.field input:focus,.field select:focus,.field textarea:focus{outline:3px solid rgba(248,172,0,.24);border-color:var(--yellow)}.primary{width:100%;border:0;border-radius:14px;background:var(--yellow);color:var(--black);padding:15px;font-weight:850;margin-top:20px}
-    .dev{display:inline-flex;margin-top:18px;background:var(--pale);color:var(--black);border-radius:99px;padding:7px 11px;font-size:12px;font-weight:800}
-    header{position:sticky;top:0;z-index:20;background:var(--yellow);color:var(--black);padding:12px max(16px,env(safe-area-inset-left));box-shadow:0 2px 16px rgba(23,23,23,.14)}
-    .header-inner{max-width:1400px;margin:auto;display:flex;align-items:center;gap:12px}.header-logo{width:150px;height:auto;flex:none}.header-title{flex:1;font-weight:850;font-size:15px}.header-title small{opacity:.95}.icon-btn{border:2px solid var(--black);background:transparent;color:var(--black);border-radius:12px;padding:10px 12px}.icon-btn:disabled{opacity:.55;cursor:wait}.install{background:var(--black);color:var(--white);border:0}
-    .sync{height:4px;background:transparent}.sync.loading{background:linear-gradient(90deg,var(--yellow),#fff,var(--yellow));background-size:200%;animation:load 1s linear infinite}@keyframes load{to{background-position:-200% 0}}
-    main{max-width:1400px;margin:auto;padding:18px 16px 90px}.statusbar{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:14px}.dot{width:9px;height:9px;border-radius:50%;background:var(--green)}.dot.offline{background:var(--red)}
-    .stats{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;overflow:auto;padding-bottom:6px}.stat{background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--shadow);border-left:5px solid var(--blue)}.stat b{display:block;font-size:26px}.stat span{font-size:12px;color:var(--muted);font-weight:700}.stat.urgent{border-color:var(--red)}.stat.pick{border-color:var(--orange)}
-    .tabs{display:flex;gap:8px;overflow:auto;margin:18px 0 14px}.tab{white-space:nowrap;border:2px solid var(--line);background:var(--white);color:var(--black);border-radius:99px;padding:10px 15px;font-weight:750}.tab.active{background:var(--yellow);color:var(--black);border-color:var(--yellow)}
-    .toolbar{display:flex;gap:10px;margin-bottom:15px}.search{flex:1;border:2px solid var(--line);border-radius:13px;padding:12px 14px;background:var(--white);color:var(--black)}.refresh,.register{border:0;border-radius:13px;background:var(--yellow);color:var(--black);padding:12px 16px;font-weight:800}.refresh:disabled{opacity:.55;cursor:wait}.register{background:var(--yellow);color:var(--black)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}.empty{background:#fff;border:2px dashed var(--line);border-radius:20px;padding:38px;text-align:center;color:var(--muted);grid-column:1/-1}
-    .order{background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;border-top:6px solid var(--blue)}.order.NEW{border-color:var(--red)}.order.IN_KITCHEN{border-color:var(--orange)}.order.DELIVERED{border-color:var(--green)}
-    .order-head{padding:16px;display:flex;gap:12px;align-items:flex-start}.room{background:var(--yellow);color:var(--black);border-radius:14px;padding:9px 12px;font-size:22px;font-weight:900}.meta{flex:1}.meta h3{margin:0;font-size:17px}.meta small{color:var(--muted)}.age{font-weight:800;color:var(--mustard);font-size:13px}
-    .badges{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}.badge{font-size:11px;font-weight:800;border-radius:99px;padding:5px 9px;background:var(--sand);color:var(--black)}.badge.allergy{background:#edc36b;color:var(--black)}.badge.status{background:var(--yellow);color:var(--black)}.badge.pickup{background:var(--pale);color:var(--black);border:1px solid var(--sand)}
-    .items{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 16px}.item{display:flex;gap:8px;margin:7px 0}.qty{font-weight:900;color:var(--mustard)}.variant{display:block;color:var(--muted);font-size:12px;font-style:italic}.notes{margin:12px 16px;padding:10px 12px;border-radius:12px;background:var(--pale);font-size:13px}.allergy-box{margin:12px 16px;padding:10px 12px;border-radius:12px;background:#edc36b;color:var(--black);font-weight:800;font-size:13px}
-    .actions{padding:14px 16px;display:grid;gap:8px}.action,.action.yellow,.action.green,.action.orange{border:0;border-radius:13px;padding:13px;font-weight:850;background:var(--yellow);color:var(--black)}.action:disabled{opacity:.55;cursor:wait}
-    .closed{opacity:.7}.closed .actions{display:none}.error{position:fixed;left:16px;right:16px;bottom:18px;z-index:60;margin:auto;max-width:620px;background:var(--yellow);color:var(--black);border:2px solid var(--black);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
-    .modal-bg{position:fixed;inset:0;background:rgba(23,23,23,.62);display:grid;place-items:center;padding:18px;z-index:50}.modal{width:min(520px,100%);max-height:90vh;overflow:auto;background:var(--white);border-radius:22px;padding:22px}.modal h2{margin-top:0}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choice{border:2px solid var(--line);background:var(--white);color:var(--black);border-radius:14px;padding:14px;font-weight:800}.choice.selected{border-color:var(--yellow);background:var(--yellow);color:var(--black)}.modal-actions{display:flex;gap:8px}.modal-actions button{flex:1;border:0;border-radius:13px;padding:13px;font-weight:800}.cancel{background:var(--white);color:var(--black);border:2px solid var(--black)!important}.save{background:var(--yellow);color:var(--black)}
-    @media(max-width:650px){.login-card{padding:25px 20px}.stats{grid-template-columns:repeat(6,115px)}.grid{grid-template-columns:1fr}.header-logo{width:110px}.header-title{font-size:13px}.choices{grid-template-columns:1fr}.order-head{padding:14px}.room{font-size:20px}.toolbar{flex-wrap:wrap}.search{flex-basis:100%}.register,.refresh{flex:1}.icon-btn{padding:9px 10px;font-size:12px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f8ac00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RS Control">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<title>Room Service Control · Kimpton Los Monteros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0d13;--panel:#10151e;--panel2:#151c28;--border:#1f2937;--amber:#f8ac00;--red:#f87171;--green:#34d399;--cyan:#22d3ee;--violet:#a78bfa;--text:#f2ede4;--muted:#8b94a3}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100dvh}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+::selection{background:rgba(248,172,0,.35)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button{font-family:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.45}
+input{font-family:inherit}
+.label{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;color:var(--muted)}
+.dot-live{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.6s ease-in-out infinite}
+.dot-off{width:7px;height:7px;border-radius:50%;background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,.45)}50%{opacity:.65;box-shadow:0 0 0 5px rgba(52,211,153,0)}}
+@keyframes shimmer{0%,100%{opacity:.45}50%{opacity:.9}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skeleton{background:var(--panel2);animation:shimmer 1.4s ease-in-out infinite;border-radius:6px}
+/* header */
+header{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--border);background:rgba(10,13,19,.95);backdrop-filter:blur(8px)}
+.hwrap{max-width:1600px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 16px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.live-badge{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;padding:6px 12px}
+.live-badge span.txt{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+.hactions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.search{width:160px;border:1px solid var(--border);border-radius:6px;background:var(--panel);padding:8px 12px;font-size:14px;color:var(--text)}
+.search::placeholder{color:rgba(139,148,163,.6)}
+.search:focus{border-color:var(--amber);outline:none}
+.icon-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);transition:color .15s}
+.icon-btn:hover{color:var(--amber)}
+.staff-btn{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);padding:10px 12px;transition:color .15s}
+.staff-btn:hover{color:var(--text)}
+.updated{max-width:1600px;margin:0 auto;padding:0 16px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(139,148,163,.7)}
+/* layout */
+main{max-width:1600px;margin:0 auto;padding:20px 16px}
+.grid{display:grid;grid-template-columns:1fr;gap:24px}
+@media(min-width:768px){.grid{grid-template-columns:repeat(2,1fr)}.search{width:224px}}
+@media(min-width:1280px){.grid{grid-template-columns:repeat(4,1fr)}}
+.col-header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px}
+.col-title{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em}
+.col-count{font-family:'JetBrains Mono',monospace;background:var(--panel2);border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700}
+.col-body{display:flex;flex-direction:column;gap:12px}
+.empty{border:1px dashed var(--border);border-radius:8px;padding:32px 16px;text-align:center;font-size:12px;color:var(--muted)}
+/* cards */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:left;width:100%;color:var(--text);transition:border-color .15s,transform .1s}
+.card:hover{border-color:#2b3a4f}
+.card:active{transform:scale(.99)}
+.card.selected{border-color:var(--amber)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.room{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;line-height:1}
+.guest-name{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px}
+.total{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;flex-shrink:0}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:4px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.badge i{width:6px;height:6px;border-radius:50%;display:inline-block}
+.urgent{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--red);margin-top:8px}
+/* error banner */
+.err-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.1);border-radius:8px;padding:12px 16px;margin-bottom:20px}
+.err-banner p{font-size:14px;color:var(--red)}
+.retry-btn{background:rgba(248,113,113,.2);color:var(--red);border:none;border-radius:6px;padding:8px 16px;font-size:14px;font-weight:600}
+.retry-btn:hover{background:rgba(248,113,113,.3)}
+/* login */
+.login-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:32px;width:100%;max-width:384px}
+.login-card h1{font-size:24px;font-weight:700;margin-top:8px}
+.login-card p.sub{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
+.login-input{width:100%;border:1px solid var(--border);border-radius:6px;background:var(--bg);padding:12px 16px;font-size:16px;color:var(--text);margin-top:24px}
+.login-input:focus{border-color:var(--amber);outline:none}
+.btn-primary{width:100%;background:var(--amber);color:var(--bg);border:none;border-radius:6px;padding:12px 16px;font-size:14px;font-weight:700;margin-top:12px;transition:opacity .15s}
+.btn-primary:hover{opacity:.9}
+/* drawer */
+.overlay{position:fixed;inset:0;z-index:40;display:flex;justify-content:flex-end}
+.overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);border:none;cursor:pointer}
+.drawer{position:relative;z-index:10;background:var(--panel);border-left:1px solid var(--border);width:100%;max-width:448px;height:100%;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--panel);padding:16px 20px}
+.drawer-body{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px}
+.drawer-body section{min-width:0}
+.d-room{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700}
+.d-total{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:var(--amber)}
+.d-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.d-sub{font-size:14px;margin-top:4px}
+.d-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-top:4px}
+.alert-box{border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.1);border-radius:8px;padding:16px}
+.alert-box .label{color:var(--red)}
+.alert-box p.val{font-size:14px;font-weight:500;margin-top:4px}
+.pickup-box{border:1px solid rgba(34,211,238,.3);background:rgba(34,211,238,.05);border-radius:8px;padding:16px}
+.pickup-box .label{color:var(--cyan)}
+.items-list{list-style:none;margin-top:8px}
+.items-list li{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.items-list li:last-child{border-bottom:none}
+.qty{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--amber);margin-right:8px}
+.item-name{font-size:14px}
+.item-variant{font-size:12px;color:var(--muted);margin-left:32px}
+.item-price{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--muted);flex-shrink:0}
+.totals{border-top:1px solid var(--border);padding-top:12px;margin-top:8px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.totals .t-row{display:flex;justify-content:space-between;color:var(--muted)}
+.totals .t-row.grand{color:var(--text);font-weight:600}
+.pay-note{font-size:12px;color:var(--muted);padding-top:4px}
+.actions{border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:8px}
+.btn-green{width:100%;background:var(--green);color:var(--bg);border:none;border-radius:6px;padding:12px 16px;font-size:14px;font-weight:700;transition:opacity .15s}
+.btn-green:hover{opacity:.9}
+.btn-cyan{width:100%;background:var(--cyan);color:var(--bg);border:none;border-radius:6px;padding:12px 16px;font-size:14px;font-weight:700;transition:opacity .15s}
+.btn-cyan:hover{opacity:.9}
+.btn-outline{width:100%;background:transparent;color:var(--green);border:1px solid rgba(52,211,153,.5);border-radius:6px;padding:12px 16px;font-size:14px;font-weight:700;transition:background .15s}
+.btn-outline:hover{background:rgba(52,211,153,.1)}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.type-btn{border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);padding:10px 12px;font-size:14px;font-weight:500;transition:all .15s}
+.type-btn:hover{color:var(--text)}
+.type-btn.active{border-color:var(--amber);background:rgba(248,172,0,.1);color:var(--amber)}
+.action-err{border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.1);border-radius:6px;padding:12px;font-size:14px;color:var(--red)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
 </head>
 <body>
-  <section id="login" class="login">
-    <div class="login-card">
-      <div class="brand"><img class="kimpton-logo" src="./kimpton-logo.svg" alt="Kimpton Los Monteros Marbella"><h1>Aplicación interna de Room Service</h1><p>Acceso exclusivo para el equipo</p></div>
-      <span class="dev">MODO DEVELOPMENT</span>
-      <div class="field"><label for="userSelect">Selecciona tu usuario</label><select id="userSelect"><option value="">Cargando usuarios…</option></select></div>
-      <div class="field"><label for="passwordInput">Contraseña</label><input id="passwordInput" type="password" autocomplete="current-password" placeholder="Introduce tu apellido"></div>
-      <button id="loginButton" class="primary">Entrar al panel</button>
-      <p id="loginError" style="color:#8c4c00;font-size:13px;font-weight:700"></p>
+<div id="app"></div>
+<script>
+const API_URL='https://roomservice-operations-api.roomservicekimptonlosmonteros.workers.dev/';
+const STAFF_KEY='rs_staff_name';
+const REFRESH_MS=20000;
+const ST={
+ NEW:{label:'Nueva',color:'#f87171',bg:'rgba(248,113,113,.12)'},
+ IN_KITCHEN:{label:'En cocina',color:'#f8ac00',bg:'rgba(248,172,0,.12)'},
+ DELIVERED:{label:'Entregada',color:'#34d399',bg:'rgba(52,211,153,.12)'},
+ CANCELLED:{label:'Cancelada',color:'#8b94a3',bg:'rgba(139,148,163,.12)'}
+};
+const PK={
+ NOT_REQUIRED:{label:'Sin recogida',color:'#8b94a3',bg:'rgba(139,148,163,.1)'},
+ PENDING:{label:'Recogida pendiente',color:'#a78bfa',bg:'rgba(167,139,250,.12)'},
+ REQUESTED:{label:'Recogida solicitada',color:'#22d3ee',bg:'rgba(34,211,238,.12)'},
+ ON_THE_WAY:{label:'En camino',color:'#22d3ee',bg:'rgba(34,211,238,.12)'},
+ COMPLETED:{label:'Recogida completada',color:'#34d399',bg:'rgba(52,211,153,.12)'}
+};
+let staffName=localStorage.getItem(STAFF_KEY)||'';
+let orders=[],counts=null,loading=true,error='',updatedAt='',selectedId=null,search='',refreshing=false;
+let detail=null,detailLoading=false,detailError='',actionError='',busy='',deliveryType='TRAY';
+let refreshTimer=null,clockTimer=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtTime(iso){if(!iso)return'--:--';const d=new Date(iso);return isNaN(d)?'--:--':d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});}
+function fmtDate(iso){if(!iso)return'';const d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});}
+function elapsedMin(iso){if(!iso)return 0;const d=new Date(iso);return isNaN(d)?0:Math.max(0,Math.floor((Date.now()-d.getTime())/60000));}
+function fmtElapsed(iso){const m=elapsedMin(iso);if(m<1)return'ahora';if(m<60)return m+' min';const h=Math.floor(m/60),r=m%60;return r?h+'h '+r+'m':h+'h';}
+function money(n){return Number(n||0).toFixed(2)+' €';}
+async function api(action,payload={}){
+ const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),20000);
+ try{
+  const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,sessionToken:'DUMMY',...payload}),signal:ctrl.signal});
+  if(!res.ok)throw new Error('Error de red ('+res.status+')');
+  const data=await res.json();
+  if(data&&data.ok===false)throw new Error(data.error||'Error del servidor');
+  return data;
+ }catch(e){
+  if(e.name==='AbortError')throw new Error('La conexión tarda demasiado. Inténtalo de nuevo.');
+  throw e;
+ }finally{clearTimeout(t);}
+}
+async function loadDashboard(silent=false){
+ if(!silent){refreshing=true;renderHeader();}
+ try{
+  const res=await api('dashboardLite');
+  orders=res.orders||[];counts=res.counts||null;updatedAt=res.generatedAt||new Date().toISOString();error='';
+ }catch(e){error=e.message||'Error de conexión';}
+ finally{loading=false;refreshing=false;renderHeader();renderMain();}
+}
+async function loadDetail(){
+ detailLoading=true;detailError='';renderDrawer();
+ try{const res=await api('order',{orderId:selectedId});detail=res.order;}
+ catch(e){detailError=e.message||'No se pudo cargar el detalle';}
+ finally{detailLoading=false;renderDrawer();}
+}
+async function runAction(key,fn){
+ busy=key;actionError='';renderDrawer();
+ try{await fn();await loadDetail();loadDashboard(true);}
+ catch(e){actionError=e.message||'La acción no se pudo completar';}
+ finally{busy='';renderDrawer();}
+}
+function badge(type,map){const s=map[type]||map.NEW||Object.values(map)[0];
+ return `<span class="badge" style="color:${s.color};background:${s.bg}"><i style="background:${s.color}"></i>${s.label}</span>`;}
+function cardHTML(o){
+ const urgent=o.orderStatus==='NEW'&&elapsedMin(o.createdAt)>15;
+ const showPickup=['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus);
+ return `<button type="button" class="card ${selectedId===o.orderId?'selected':''}" data-order="${esc(o.orderId)}" aria-pressed="${selectedId===o.orderId}" ${urgent?'style="border-color:rgba(248,113,113,.5)"':''}>
+  <div class="card-top">
+   <div style="display:flex;align-items:baseline;gap:12px;min-width:0">
+    <span class="room">${esc(o.room)}</span>
+    <div style="min-width:0"><p class="guest-name">${esc(o.guest||'Sin nombre')}</p>
+    <p class="card-meta">${fmtTime(o.createdAt)} · hace ${fmtElapsed(o.createdAt)}</p></div>
+   </div>
+   <span class="total">${money(o.total)}</span>
+  </div>
+  <div class="badges">${badge(o.orderStatus,ST)}${showPickup?badge(o.pickupStatus,PK):''}${o.assignedTo?`<span class="badge" style="color:var(--muted);background:var(--panel2)">${esc(o.assignedTo)}</span>`:''}</div>
+  ${urgent?'<p class="urgent">Lleva más de 15 min sin entrar en cocina</p>':''}
+ </button>`;
+}
+function columnHTML(title,color,count,items,emptyText){
+ return `<section><div class="col-header"><h2 class="col-title" style="color:${color}">${title}</h2><span class="col-count">${count}</span></div>
+ <div class="col-body">${items.length?items.map(cardHTML).join(''):`<div class="empty">${emptyText}</div>`}</div></section>`;
+}
+function filteredOrders(){
+ const t=search.trim().toLowerCase();
+ if(!t)return orders;
+ return orders.filter(o=>String(o.room).includes(t)||(o.guest||'').toLowerCase().includes(t));
+}
+function renderHeader(){
+ const el=$('header-slot');if(!el)return;
+ el.innerHTML=`<header><div class="hwrap">
+  <div class="brand"><span class="brand-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0d13" stroke-width="2.2" stroke-linecap="round"><path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 10V7"/><circle cx="12" cy="5.5" r="1" fill="#0a0d13" stroke="none"/></svg></span>
+  <div><p class="label" style="letter-spacing:.2em;font-size:9px">Kimpton Los Monteros</p><h1 style="font-size:14px;font-weight:700;line-height:1.2">Room Service Control</h1></div></div>
+  <div class="live-badge"><span class="${error?'dot-off':'dot-live'}"></span><span class="txt">${error?'Sin conexión':'En vivo'}</span></div>
+  <span class="clock" style="display:none" id="clock">${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</span>
+  <div class="hactions">
+   <input class="search" id="search-input" placeholder="Buscar habitación o huésped" aria-label="Buscar comandas" value="${esc(search)}">
+   <button type="button" class="icon-btn" id="refresh-btn" aria-label="Actualizar ahora" title="Actualizar ahora" ${refreshing?'disabled':''}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ${refreshing?'style="animation:spin 1s linear infinite"':''}><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+   </button>
+   <button type="button" class="staff-btn" id="staff-btn" title="Cambiar de usuario">${esc(staffName)}</button>
+  </div></div>
+  ${updatedAt&&!error?`<p class="updated">Actualizado ${fmtTime(updatedAt)} · auto cada 20 s</p>`:''}
+ </header>`;
+ $('refresh-btn').onclick=()=>loadDashboard();
+ $('staff-btn').onclick=()=>{if(confirm('¿Cambiar de usuario?')){localStorage.removeItem(STAFF_KEY);staffName='';selectedId=null;clearInterval(refreshTimer);render();}};
+ const si=$('search-input');
+ si.oninput=e=>{search=e.target.value;renderMain();};
+ si.onfocus=()=>{const v=si.value;si.value='';si.value=v;};
+ if(window.innerWidth>=640)$('clock').style.display='inline';
+}
+function renderMain(){
+ const el=$('main-slot');if(!el)return;
+ if(loading){
+  el.innerHTML=`<main><div class="grid">${[0,1,2,3].map(()=>`<div><div class="skeleton" style="height:20px;width:128px;margin-bottom:12px"></div><div class="skeleton" style="height:112px;margin-bottom:12px"></div><div class="skeleton" style="height:112px"></div></div>`).join('')}</div></main>`;
+  return;
+ }
+ const f=filteredOrders();
+ const news=f.filter(o=>o.orderStatus==='NEW');
+ const kitchen=f.filter(o=>o.orderStatus==='IN_KITCHEN');
+ const pickups=f.filter(o=>o.orderStatus==='DELIVERED'&&['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus));
+ const delivered=f.filter(o=>o.orderStatus==='DELIVERED'&&!['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus));
+ el.innerHTML=`<main>
+ ${error?`<div class="err-banner"><p>${esc(error)}</p><button type="button" class="retry-btn" id="retry-btn">Reintentar</button></div>`:''}
+ <div class="grid">
+  ${columnHTML('Nuevas','#f87171',counts?.new??news.length,news,'Sin comandas nuevas')}
+  ${columnHTML('En cocina','#f8ac00',counts?.inKitchen??kitchen.length,kitchen,'Nada en preparación')}
+  ${columnHTML('Recogidas','#22d3ee',pickups.length,pickups,'Sin recogidas pendientes')}
+  ${columnHTML('Entregadas','#34d399',delivered.length,delivered,'Ninguna entregada todavía')}
+ </div></main>`;
+ if($('retry-btn'))$('retry-btn').onclick=()=>loadDashboard();
+ document.querySelectorAll('[data-order]').forEach(b=>{
+  b.onclick=()=>{selectedId=b.dataset.order;detail=null;actionError='';deliveryType='TRAY';renderMain();renderDrawer();loadDetail();};
+ });
+}
+function renderDrawer(){
+ const el=$('drawer-slot');if(!el)return;
+ if(!selectedId){el.innerHTML='';return;}
+ let body='';
+ if(detailLoading){body=`<div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:128px"></div><div class="skeleton" style="height:96px"></div>`;}
+ else if(detailError){body=`<div class="empty" style="border-color:rgba(248,113,113,.4)"><p style="color:var(--red);font-size:14px">${esc(detailError)}</p><button type="button" class="retry-btn" id="detail-retry" style="margin-top:12px">Reintentar</button></div>`;}
+ else if(detail){
+  const o=detail;
+  const lp=o.pickups&&o.pickups.length?o.pickups[o.pickups.length-1]:null;
+  body=`
+  <section><div class="d-row"><span class="d-room">Hab. ${esc(o.room)}</span><span class="d-total">${money(o.total)}</span></div>
+   <p class="d-sub">${esc(o.guest)} · ${o.pax} pax</p>
+   <p class="d-meta">${fmtDate(o.createdAt)} ${fmtTime(o.createdAt)} · ${esc(o.service)}</p>
+   <div class="badges">${badge(o.orderStatus,ST)}${o.pickupStatus!=='NOT_REQUIRED'?badge(o.pickupStatus,PK):''}</div></section>
+  ${o.allergy==='Sí'?`<section class="alert-box"><p class="label">Alergias</p><p class="val">${esc(o.allergyDetail||'Declaradas sin detalle')}</p></section>`:''}
+  <section><p class="label">Productos</p><ul class="items-list">
+   ${o.items.map(it=>`<li><div><p class="item-name"><span class="qty">${it.quantity}×</span>${esc(it.nameEs)}</p>${it.variantEs?`<p class="item-variant">${esc(it.variantEs)}</p>`:''}${it.notes?`<p class="item-variant">${esc(it.notes)}</p>`:''}</div><span class="item-price">${money(it.subtotal)}</span></li>`).join('')}
+  </ul>
+  <div class="totals"><div class="t-row"><span>Subtotal</span><span class="mono">${money(o.subtotal)}</span></div>
+   <div class="t-row"><span>Delivery</span><span class="mono">${money(o.deliveryCharge)}</span></div>
+   <div class="t-row grand"><span>Total</span><span class="mono">${money(o.total)}</span></div>
+   <p class="pay-note">Pago: ${esc(o.payment)}${o.cashAmount?` · Efectivo: ${esc(o.cashAmount)} €`:''}</p></div></section>
+  ${o.notes?`<section><p class="label" style="margin-bottom:4px">Notas</p><p style="font-size:14px">${esc(o.notes)}</p></section>`:''}
+  ${lp&&['REQUESTED','ON_THE_WAY','COMPLETED'].includes(lp.pickupStatus)?`<section class="pickup-box"><p class="label">Recogida</p>
+   <p style="font-size:14px;margin-top:4px">${lp.location==='OUTSIDE_DOOR'?'Fuera de la puerta':'Dentro de la habitación'}${lp.guestName?' · '+esc(lp.guestName):''}</p>
+   ${lp.guestNotes?`<p style="font-size:12px;color:var(--muted);margin-top:4px">${esc(lp.guestNotes)}</p>`:''}
+   ${lp.requestedAt?`<p class="d-meta">Solicitada: ${fmtTime(lp.requestedAt)}</p>`:''}</section>`:''}
+  ${actionError?`<p class="action-err">${esc(actionError)}</p>`:''}
+  <section class="actions">
+   ${o.orderStatus==='NEW'?`<button type="button" class="btn-primary" id="act-cook" ${busy?'disabled':''}>${busy==='cook'?'Procesando…':'Marchando en cocina'}</button>`:''}
+   ${o.orderStatus==='IN_KITCHEN'?`<p class="label">Entregar como</p>
+    <div class="type-grid">
+     <button type="button" class="type-btn ${deliveryType==='TRAY'?'active':''}" id="type-tray" aria-pressed="${deliveryType==='TRAY'}">Bandeja</button>
+     <button type="button" class="type-btn ${deliveryType==='TROLLEY'?'active':''}" id="type-trolley" aria-pressed="${deliveryType==='TROLLEY'}">Mesa / carro</button>
     </div>
-  </section>
-
-  <section id="app" class="hidden">
-    <header><div class="header-inner"><img class="header-logo" src="./kimpton-logo.svg" alt="Kimpton"><div class="header-title"><span id="currentUser"></span></div><button id="installButton" class="icon-btn install hidden">Instalar</button><button id="logoutButton" class="icon-btn">Cerrar sesión</button></div><div id="syncBar" class="sync"></div></header>
-    <main>
-      <div class="statusbar"><span id="onlineDot" class="dot"></span><span id="connectionText">Conectado</span><span>·</span><span id="lastUpdate">Sin actualizar</span></div>
-      <div id="stats" class="stats"></div>
-      <div class="tabs"><button class="tab active" data-tab="active">Operativa</button><button class="tab" data-tab="pickups">Recogidas</button><button class="tab" data-tab="closed">Completados</button><button class="tab" data-tab="all">Todos</button></div>
-      <div class="toolbar"><input id="search" class="search" placeholder="Buscar habitación, huésped o pedido"><button id="registerServiceButton" class="register">+ Registrar servicio</button><button id="refreshButton" class="refresh">Actualizar</button></div>
-      <div id="orders" class="grid"></div>
-    </main>
-  </section>
-
-  <div id="deliveryModal" class="modal-bg hidden"><div class="modal"><h2>Seleccionar entrega</h2><p id="modalOrder"></p><div class="choices" id="deliveryChoices"></div><div class="field"><label for="materialDetails">Detalle adicional <small>(opcional)</small></label><textarea id="materialDetails" rows="3" placeholder="Ej.: 1 bandeja, 2 platos y 2 copas"></textarea></div><div class="modal-actions"><button id="cancelModal" class="cancel">Cancelar</button><button id="saveDelivery" class="save">Guardar</button></div></div></div>
-  <div id="manualServiceModal" class="modal-bg hidden"><div id="manualServiceContent" class="modal"><h2>Registrar servicio entregado</h2><p id="manualIntro">La fecha y hora se guardarán automáticamente.</p><div class="field"><label for="manualRoom">Habitación</label><input id="manualRoom" inputmode="numeric" autocomplete="off" placeholder="Ej.: 611"></div><div class="field"><label>Formato de entrega</label><div class="choices"><button class="choice manual-choice" data-type="TABLE_TROLLEY">Mesa/trolley</button><button class="choice manual-choice" data-type="TRAY">Bandeja</button><button class="choice manual-choice" data-type="DRINKS_ONLY">Solo bebida · sin recogida</button><button class="choice manual-choice" data-type="DRINKS_GLASSWARE">Bebidas/cristalería</button><button class="choice manual-choice" data-type="CROCKERY">Vajilla</button><button class="choice manual-choice" data-type="OTHER">Otro</button></div></div><div id="manualNotesField" class="field"><label for="manualNotes">Observaciones <small>(opcional)</small></label><textarea id="manualNotes" rows="3" placeholder="Información útil para la recogida"></textarea></div><div id="manualActions" class="modal-actions"><button id="cancelManualService" class="cancel">Cancelar</button><button id="saveManualService" class="save">Registrar</button></div></div></div>
-  <div id="errorToast" class="error hidden"></div>
-
-  <script>
-    var API = 'https://script.google.com/macros/s/AKfycbxtmnl_DaupQLnuEpyp_LCjZ-hScwNCS7u71uj5Biinp9zL3S1UrUYELqT9_ITr3XRZQg/exec';
-    var quickServiceMode = new URLSearchParams(window.location.search).get('quickService') === '1';
-    var state = { user:null, sessionToken:'', data:null, tab:'active', search:'', loading:false, lastUpdatedAt:null, modalOrderId:null, deliveryType:null, manualDeliveryType:null, previousNew:0, previousRequested:0 };
-    var deliveryLabels = { TABLE_TROLLEY:'Mesa / carro', TRAY:'Bandeja', DRINKS_ONLY:'Solo bebida · sin recogida', DRINKS_GLASSWARE:'Bebidas / cristalería', CROCKERY:'Vajilla', OTHER:'Otro' };
-    var pickupLocationLabels = { INSIDE_ROOM:'Dentro de la habitación', OUTSIDE_DOOR:'Fuera de la puerta', TERRACE:'Terraza', OTHER:'Otra ubicación' };
-    var statusLabels = { NEW:'Nueva', IN_KITCHEN:'Marchando en cocina', READY:'Preparada', DELIVERED:'Entregada', CANCELLED:'Cancelada', NOT_SELECTED:'Sin formato', SELECTED:'Formato seleccionado', NOT_REQUIRED:'Sin recogida', PENDING:'Pendiente de recogida', REQUESTED:'Recogida solicitada', ON_THE_WAY:'En camino', COMPLETED:'Recogida completada' };
-
-    document.addEventListener('DOMContentLoaded', init);
-    function init(){
-      if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
-      bindEvents(); loadUsers();
-      var saved=localStorage.getItem('rsSession'); if(saved){try{var session=JSON.parse(saved);state.user=session.user;state.sessionToken=session.sessionToken||'';}catch(e){localStorage.removeItem('rsSession');}}
-      window.rsElapsedTimer=setInterval(updateLastUpdatedLabel,1000);
-    }
-    function bindEvents(){
-      document.getElementById('loginButton').onclick=login;
-      document.getElementById('passwordInput').onkeydown=function(e){if(e.key==='Enter')login();};
-      document.getElementById('logoutButton').onclick=logout;
-      document.getElementById('refreshButton').onclick=loadDashboard;
-      document.getElementById('registerServiceButton').onclick=openManualService;
-      document.getElementById('search').oninput=function(e){state.search=e.target.value.toLowerCase();renderOrders();};
-      document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});b.classList.add('active');state.tab=b.dataset.tab;renderOrders();};});
-      document.getElementById('cancelModal').onclick=closeModal;
-      document.getElementById('saveDelivery').onclick=saveDelivery;
-      document.getElementById('cancelManualService').onclick=closeManualService;
-      document.getElementById('saveManualService').onclick=saveManualService;
-      document.querySelectorAll('.manual-choice').forEach(function(b){b.onclick=function(){document.querySelectorAll('.manual-choice').forEach(function(x){x.classList.remove('selected');});b.classList.add('selected');state.manualDeliveryType=b.dataset.type;if(quickServiceMode)saveManualService();};});
-      window.addEventListener('online',updateConnection); window.addEventListener('offline',updateConnection); updateConnection();
-    }
-    async function loadUsers(){
-      try{var d=await apiGet('users');var s=document.getElementById('userSelect');s.innerHTML='<option value="">Selecciona tu nombre</option>'+d.users.map(function(u){return '<option value="'+esc(u.userId)+'">'+esc(u.displayName)+' — '+esc(u.role)+'</option>';}).join('');if(state.user){s.value=state.user.userId;showApp();}}
-      catch(e){document.getElementById('loginError').textContent=e.message;}
-    }
-    function login(){var id=document.getElementById('userSelect').value;var password=document.getElementById('passwordInput').value;if(!id||!password){document.getElementById('loginError').textContent='Selecciona tu usuario e introduce tu contraseña.';return;}var button=document.getElementById('loginButton');button.disabled=true;button.textContent='Comprobando…';apiPost({action:'login',userId:id,password:password},true).then(function(d){state.user=d.user;state.sessionToken=d.sessionToken;localStorage.setItem('rsSession',JSON.stringify({user:state.user,sessionToken:state.sessionToken}));document.getElementById('passwordInput').value='';document.getElementById('loginError').textContent='';playTone(520);showApp();}).catch(function(e){document.getElementById('loginError').textContent=e.message;}).finally(function(){button.disabled=false;button.textContent='Entrar al panel';});}
-    function logout(){var token=state.sessionToken;if(token)apiPost({action:'logout',sessionToken:token},true).catch(function(){});localStorage.removeItem('rsSession');state.user=null;state.sessionToken='';state.data=null;state.lastUpdatedAt=null;if(window.rsTimer){clearInterval(window.rsTimer);window.rsTimer=null;}document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('passwordInput').value='';}
-    function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('currentUser').textContent=state.user.displayName;if(quickServiceMode){setTimeout(openManualService,0);return;}loadDashboard();if(!window.rsTimer)window.rsTimer=setInterval(loadDashboard,5000);}
-    async function loadDashboard(){if(state.loading)return;state.loading=true;var refresh=document.getElementById('refreshButton');refresh.disabled=true;refresh.textContent='Actualizando…';document.getElementById('syncBar').classList.add('loading');updateLastUpdatedLabel();try{var d=await apiGet('dashboard');if(state.data){if(d.counts.new>state.previousNew)playTone(760);if(d.counts.pickupRequested>state.previousRequested)playTone(980);}state.data=d;state.previousNew=d.counts.new;state.previousRequested=d.counts.pickupRequested;state.lastUpdatedAt=Date.now();render();updateLastUpdatedLabel();}catch(e){if(/sesión|sesion/i.test(e.message)){logout();}showError(e);}finally{state.loading=false;refresh.disabled=false;refresh.textContent='Actualizar';document.getElementById('syncBar').classList.remove('loading');}}
-    function updateLastUpdatedLabel(){var label=document.getElementById('lastUpdate');if(!label)return;if(state.loading){label.textContent='Actualizando la base de datos…';return;}if(!state.lastUpdatedAt){label.textContent='Sin actualizar';return;}var seconds=Math.max(0,Math.floor((Date.now()-state.lastUpdatedAt)/1000));label.textContent=seconds<60?'Actualizado hace '+seconds+' s':'Actualizado hace '+Math.floor(seconds/60)+' min';}
-    function render(){renderStats();renderOrders();}
-    function renderStats(){var c=state.data.counts;var values=[['Nuevas',c.new,'urgent'],['En cocina',c.inKitchen,''],['Entregadas',c.delivered,''],['Por recoger',c.pickupPending,'pick'],['Solicitadas',c.pickupRequested,'urgent'],['En camino',c.pickupOnTheWay,'pick']];document.getElementById('stats').innerHTML=values.map(function(x){return '<div class="stat '+x[2]+'"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>';}).join('');}
-    function renderOrders(){if(!state.data)return;var list=state.data.orders.filter(matchTab).filter(function(o){var q=state.search;return !q||String(o.room).toLowerCase().includes(q)||String(o.guest).toLowerCase().includes(q)||String(o.orderId).toLowerCase().includes(q);});document.getElementById('orders').innerHTML=list.length?list.map(orderCard).join(''):'<div class="empty"><strong>No hay comandas en esta vista</strong><br><small>El panel se actualiza automáticamente.</small></div>';bindDynamicActions();}
-    function matchTab(o){if(state.tab==='all')return true;if(state.tab==='closed')return o.pickupStatus==='COMPLETED'||(o.orderStatus==='DELIVERED'&&o.pickupStatus==='NOT_REQUIRED')||o.orderStatus==='CANCELLED';if(state.tab==='pickups')return ['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus);return o.pickupStatus!=='COMPLETED'&&!(o.orderStatus==='DELIVERED'&&o.pickupStatus==='NOT_REQUIRED')&&o.orderStatus!=='CANCELLED';}
-    function orderCard(o){var manual=o.source==='STAFF_MANUAL';var items=o.items.map(function(i){return '<div class="item"><span class="qty">'+i.quantity+'×</span><span><b>'+esc(i.nameEs)+'</b>'+(i.variantEs?'<span class="variant">'+esc(i.variantEs)+'</span>':'')+'</span></div>';}).join('');var itemsBlock=items?'<div class="items">'+items+'</div>':'';var age=minutesAgo(o.createdAt);var orderLabel=statusLabels[o.orderStatus]||o.orderStatus;var deliveryLabel=statusLabels[o.deliveryStatus]||o.deliveryStatus;var deliveryBadge=deliveryLabel&&deliveryLabel!==orderLabel?'<span class="badge">'+esc(deliveryLabel)+'</span>':'';var pickup='<span class="badge pickup">'+esc(statusLabels[o.pickupStatus]||o.pickupStatus)+'</span>';var allergy=o.allergy==='Sí'?'<div class="allergy-box">⚠ Alergia/intolerancia: '+esc(o.allergyDetail||'Sí')+'</div>':'';var notes=o.notes?'<div class="notes">📝 '+esc(o.notes)+'</div>':'';var closed=o.pickupStatus==='COMPLETED'||(o.orderStatus==='DELIVERED'&&o.pickupStatus==='NOT_REQUIRED')?' closed':'';return '<article class="order '+esc(o.orderStatus)+closed+'" data-id="'+esc(o.orderId)+'"><div class="order-head"><div class="room">'+esc(o.room)+'</div><div class="meta"><h3>'+esc(manual?'Registrado por '+o.assignedTo:o.guest)+'</h3><small>'+esc(manual?'Entrega registrada':o.pax+' pax')+' · '+formatTime(o.createdAt)+'</small></div><span class="age">'+age+' min</span></div><div class="badges"><span class="badge status">'+esc(orderLabel)+'</span>'+deliveryBadge+pickup+(manual?'<span class="badge">STAFF</span>':'')+(o.allergy==='Sí'?'<span class="badge allergy">ALERGIA</span>':'')+'</div>'+allergy+itemsBlock+notes+deliveryInfo(o)+pickupInfo(o)+'<div class="actions">'+buttonsFor(o)+'</div></article>';}
-    function deliveryInfo(o){if(!o.deliveries||!o.deliveries.length)return '';var d=o.deliveries[o.deliveries.length-1];return '<div class="notes"><b>Entrega:</b> '+esc(deliveryLabels[d.deliveryType]||d.deliveryType)+(d.materialDetails?'<br>'+esc(d.materialDetails):'')+'</div>';}
-    function pickupInfo(o){if(!o.pickups||!o.pickups.length)return '';var p=o.pickups[o.pickups.length-1];var person=p.pickupStatus==='COMPLETED'&&p.collectedByName?'<br><b>Recogido por:</b> '+esc(p.collectedByName)+(p.collectedAt?' · '+formatDateTime(p.collectedAt):''):(p.assignedToName?'<br>Asignada a '+esc(p.assignedToName):'');var guest=p.guestName?'<br><b>Huésped:</b> '+esc(p.guestName):'';var where=p.location?'<br><b>Ubicación:</b> '+esc(pickupLocationLabels[p.location]||p.location):'';var rating=p.rating?'<br><b>Valoración:</b> '+esc(p.rating)+'/5':'';var feedback=p.feedback?'<br><b>Feedback:</b> '+esc(p.feedback):'';return '<div class="notes"><b>Recogida:</b> '+esc(statusLabels[p.pickupStatus]||p.pickupStatus)+guest+where+(p.guestNotes?'<br><b>Notas:</b> '+esc(p.guestNotes):'')+rating+feedback+person+'</div>';}
-    function buttonsFor(o){var buttons='';if(o.orderStatus==='NEW')buttons='<button class="action yellow" data-action="startCooking">👨‍🍳 Marchando en cocina</button>';else if(o.orderStatus==='IN_KITCHEN'&&o.deliveryStatus==='NOT_SELECTED')buttons='<button class="action orange" data-action="delivery">Seleccionar mesa, bandeja o bebidas</button>';else if(o.orderStatus==='IN_KITCHEN'&&o.deliveryStatus==='SELECTED')buttons='<button class="action green" data-action="markDelivered">✅ Entregado</button>';else if(o.pickupStatus==='REQUESTED')buttons='<button class="action orange" data-action="pickupOnWay">🚶 En camino para recoger</button><button class="action green" data-action="completeDeliveryPickup">✅ Recogido</button>';else if(o.pickupStatus==='ON_THE_WAY')buttons='<button class="action green" data-action="completeDeliveryPickup">✅ Recogido</button>';else if(o.pickupStatus==='PENDING')buttons='<button class="action" disabled>Esperando recogida</button><button class="action green" data-action="completeDeliveryPickup">✅ Recogido</button>';if(state.user&&state.user.role==='ADMIN')buttons+='<button class="action" data-action="deleteOrder">Eliminar del panel</button>';return buttons;}
-    function bindDynamicActions(){document.querySelectorAll('[data-action]').forEach(function(b){b.onclick=function(){var card=b.closest('[data-id]');var id=card.dataset.id;var action=b.dataset.action;if(action==='delivery'){openDelivery(id);return;}if(action==='deleteOrder'&&!confirm('¿Eliminar esta comanda del panel? El historial se conservará.'))return;var order=state.data.orders.find(function(o){return o.orderId===id;});var body={action:action,userId:state.user.userId,orderId:id};if(action==='pickupOnWay'){var p=order.pickups[order.pickups.length-1];body.pickupId=p.pickupId;}if(action==='completeDeliveryPickup'){var d=order.deliveries[order.deliveries.length-1];body.deliveryId=d.deliveryId;}b.disabled=true;apiPost(body).then(loadDashboard).catch(showError).finally(function(){b.disabled=false;});};});}
-    function openDelivery(orderId){state.modalOrderId=orderId;state.deliveryType=null;document.getElementById('modalOrder').textContent='Pedido '+orderId;document.getElementById('materialDetails').value='';var choices=document.getElementById('deliveryChoices');choices.innerHTML=Object.keys(deliveryLabels).map(function(k){return '<button class="choice" data-type="'+k+'">'+deliveryLabels[k]+'</button>';}).join('');choices.querySelectorAll('.choice').forEach(function(b){b.onclick=function(){choices.querySelectorAll('.choice').forEach(function(x){x.classList.remove('selected');});b.classList.add('selected');state.deliveryType=b.dataset.type;};});document.getElementById('deliveryModal').classList.remove('hidden');}
-    function closeModal(){document.getElementById('deliveryModal').classList.add('hidden');state.modalOrderId=null;state.deliveryType=null;}
-    function saveDelivery(){if(!state.deliveryType){showError(new Error('Selecciona el tipo de entrega.'));return;}var details=document.getElementById('materialDetails').value.trim();apiPost({action:'selectDeliveryType',orderId:state.modalOrderId,deliveryType:state.deliveryType,materialDetails:details,userId:state.user.userId}).then(function(){closeModal();return loadDashboard();}).catch(showError);}
-    function openManualService(){state.manualDeliveryType=null;document.getElementById('manualRoom').value='';document.getElementById('manualNotes').value='';document.querySelectorAll('.manual-choice').forEach(function(x){x.classList.remove('selected');x.disabled=false;});document.getElementById('manualNotesField').classList.toggle('hidden',quickServiceMode);document.getElementById('manualActions').classList.toggle('hidden',quickServiceMode);document.getElementById('manualIntro').textContent=quickServiceMode?'Escribe la habitación y pulsa el tipo de servicio. Se registrará automáticamente.':'La fecha y hora se guardarán automáticamente.';document.getElementById('manualServiceModal').classList.remove('hidden');setTimeout(function(){document.getElementById('manualRoom').focus();},100);}
-    function closeManualService(){document.getElementById('manualServiceModal').classList.add('hidden');state.manualDeliveryType=null;}
-    function saveManualService(){var room=document.getElementById('manualRoom').value.trim();if(!room){state.manualDeliveryType=null;document.querySelectorAll('.manual-choice').forEach(function(x){x.classList.remove('selected');});showError(new Error('Introduce primero la habitación.'));document.getElementById('manualRoom').focus();return;}if(!state.manualDeliveryType){showError(new Error('Selecciona el tipo de servicio.'));return;}var button=document.getElementById('saveManualService');button.disabled=true;document.querySelectorAll('.manual-choice').forEach(function(x){x.disabled=true;});apiPost({action:'createManualService',room:room,deliveryType:state.manualDeliveryType,notes:quickServiceMode?'':document.getElementById('manualNotes').value.trim(),userId:state.user.userId}).then(function(){playTone(620);if(quickServiceMode){document.getElementById('manualServiceContent').innerHTML='<div style="text-align:center;padding:18px 4px"><div style="font-size:56px">✅</div><h2>Servicio registrado</h2><p>Habitación <b>'+esc(room)+'</b> · '+esc(deliveryLabels[state.manualDeliveryType]||state.manualDeliveryType)+'</p><p style="color:var(--muted)">Ya puedes cerrar esta ventana.</p><button class="primary" onclick="window.close()">Cerrar</button></div>';return;}closeManualService();return loadDashboard();}).catch(function(e){document.querySelectorAll('.manual-choice').forEach(function(x){x.disabled=false;});showError(e);}).finally(function(){if(button)button.disabled=false;});}
-    async function apiGet(action){assertApiConfigured();var url=API+'?action='+encodeURIComponent(action);if(state.sessionToken&&action!=='users')url+='&sessionToken='+encodeURIComponent(state.sessionToken);var r=await fetch(url,{cache:'no-store'});var d=await r.json();if(!d.ok)throw new Error(d.error||'Error de API');return d;}
-    function assertApiConfigured(){if(!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(API))throw new Error('Falta configurar la URL /exec de Apps Script.');} async function apiPost(body,skipSession){assertApiConfigured();var payload=Object.assign({},body);if(!skipSession&&state.sessionToken)payload.sessionToken=state.sessionToken;var r=await fetch(API,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});var text=await r.text();var d;try{d=JSON.parse(text);}catch(e){throw new Error('Apps Script devolvió una respuesta no válida. Comprueba la implementación /exec.');}if(!d.ok)throw new Error(d.error||'Error de API');return d;}
-    function updateConnection(){var on=navigator.onLine;document.getElementById('onlineDot').classList.toggle('offline',!on);document.getElementById('connectionText').textContent=on?'Conectado':'Sin conexión';}
-    function showError(e){var t=document.getElementById('errorToast');t.textContent=e.message||String(e);t.classList.remove('hidden');setTimeout(function(){t.classList.add('hidden');},5000);}
-    function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
-    function formatTime(v){return new Date(v).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});}
-    function formatDateTime(v){return new Date(v).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-    function minutesAgo(v){return Math.max(0,Math.floor((Date.now()-new Date(v).getTime())/60000));}
-    function playTone(freq){try{var a=new(window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator();var g=a.createGain();o.frequency.value=freq;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.08,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.25);o.start();o.stop(a.currentTime+.25);}catch(e){}}
-    var deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var b=document.getElementById('installButton');b.classList.remove('hidden');b.onclick=function(){deferredPrompt.prompt();deferredPrompt.userChoice.finally(function(){b.classList.add('hidden');deferredPrompt=null;});};});
-  </script>
+    <button type="button" class="btn-green" id="act-deliver" ${busy?'disabled':''}>${busy==='deliver'?'Procesando…':'Marcar entregado'}</button>`:''}
+   ${lp&&lp.pickupStatus==='REQUESTED'?`<button type="button" class="btn-cyan" id="act-way" ${busy?'disabled':''}>${busy==='way'?'Procesando…':'Recogida en camino'}</button>`:''}
+   ${lp&&['REQUESTED','ON_THE_WAY'].includes(lp.pickupStatus)?`<button type="button" class="btn-outline" id="act-done" ${busy?'disabled':''}>${busy==='done'?'Procesando…':'Recogida completada'}</button>`:''}
+  </section>`;
+ }
+ el.innerHTML=`<div class="overlay" role="dialog" aria-modal="true" aria-label="Detalle de comanda">
+  <button type="button" class="overlay-bg" id="overlay-close" aria-label="Cerrar detalle"></button>
+  <aside class="drawer"><div class="drawer-header"><div><p class="label">Comanda</p><p class="mono" style="font-size:12px;color:var(--muted);margin-top:4px">${esc(selectedId)}</p></div>
+  <button type="button" class="icon-btn" id="drawer-close" aria-label="Cerrar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="drawer-body">${body}</div></aside></div>`;
+ $('overlay-close').onclick=closeDrawer;
+ $('drawer-close').onclick=closeDrawer;
+ if($('detail-retry'))$('detail-retry').onclick=loadDetail;
+ if($('act-cook'))$('act-cook').onclick=()=>runAction('cook',()=>api('startCooking',{orderId:selectedId,staffName}));
+ if($('type-tray'))$('type-tray').onclick=()=>{deliveryType='TRAY';renderDrawer();};
+ if($('type-trolley'))$('type-trolley').onclick=()=>{deliveryType='TROLLEY';renderDrawer();};
+ if($('act-deliver'))$('act-deliver').onclick=()=>runAction('deliver',()=>api('selectDeliveryType',{orderId:selectedId,staffName,deliveryType}));
+ if($('act-way')){const lp=detail.pickups[detail.pickups.length-1];$('act-way').onclick=()=>runAction('way',()=>api('pickupOnWay',{pickupId:lp.pickupId,staffName}));}
+ if($('act-done')){const lp=detail.pickups[detail.pickups.length-1];$('act-done').onclick=()=>runAction('done',()=>api('completePickup',{pickupId:lp.pickupId,staffName}));}
+}
+function closeDrawer(){selectedId=null;detail=null;renderDrawer();renderMain();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selectedId)closeDrawer();});
+function render(){
+ const app=$('app');
+ if(!staffName){
+  app.innerHTML=`<div class="login-wrap"><div class="login-card">
+   <p class="label" style="color:var(--amber);letter-spacing:.2em">Kimpton Los Monteros</p>
+   <h1>Room Service Control</h1>
+   <p class="sub">Identifícate con tu nombre para registrar las acciones a tu cargo.</p>
+   <form id="login-form"><input class="login-input" id="login-input" placeholder="Tu nombre" autofocus maxlength="40" autocomplete="name">
+   <button type="submit" class="btn-primary" id="login-submit" disabled>Entrar al panel</button></form></div></div>`;
+  const inp=$('login-input'),btn=$('login-submit');
+  inp.oninput=()=>{btn.disabled=!inp.value.trim();};
+  $('login-form').onsubmit=e=>{e.preventDefault();const n=inp.value.trim();if(!n)return;localStorage.setItem(STAFF_KEY,n);staffName=n;startApp();};
+  return;
+ }
+ app.innerHTML='<div id="header-slot"></div><div id="main-slot"></div><div id="drawer-slot"></div>';
+ renderHeader();renderMain();renderDrawer();
+}
+function startApp(){
+ render();loading=true;loadDashboard();
+ clearInterval(refreshTimer);
+ refreshTimer=setInterval(()=>{if(!selectedId)loadDashboard(true);},REFRESH_MS);
+ clearInterval(clockTimer);
+ clockTimer=setInterval(()=>{const c=$('clock');if(c)c.textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});},30000);
+}
+if(staffName)startApp();else render();
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
 </body>
 </html>
