@@ -72,7 +72,8 @@ main{max-width:1600px;margin:0 auto;padding:20px 16px}
 .badge{display:inline-flex;align-items:center;gap:6px;border-radius:4px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .badge i{width:6px;height:6px;border-radius:50%;display:inline-block}
 .urgent{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--red);margin-top:8px}
-/* error banner */
+/* banners */
+.info-banner{display:flex;align-items:center;gap:10px;border:1px solid rgba(248,172,0,.35);background:rgba(248,172,0,.08);border-radius:8px;padding:12px 16px;margin-bottom:20px;color:var(--amber);font-size:14px;font-weight:500}
 .err-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.1);border-radius:8px;padding:12px 16px;margin-bottom:20px}
 .err-banner p{font-size:14px;color:var(--red)}
 .retry-btn{background:rgba(248,113,113,.2);color:var(--red);border:none;border-radius:6px;padding:8px 16px;font-size:14px;font-weight:600}
@@ -167,7 +168,7 @@ let staffName=localStorage.getItem(STAFF_KEY)||'';
 let sessionToken=localStorage.getItem(TOKEN_KEY)||'';
 let userId=localStorage.getItem(USER_KEY)||'';
 let selectedUserName='',loginError='';
-let orders=[],counts=null,loading=true,error='',updatedAt='',selectedId=null,search='',refreshing=false;
+let orders=[],counts=null,loading=false,error='',notice='',updatedAt='',selectedId=null,search='',refreshing=false;
 let detail=null,detailLoading=false,detailError='',actionError='',busy='',deliveryType='TRAY';
 let refreshTimer=null,clockTimer=null,dashboardInFlight=false;
 let dashboardMode=localStorage.getItem(DASH_MODE_KEY)||'';
@@ -242,12 +243,15 @@ async function logout(){
 async function loadDashboard(){
  if(dashboardInFlight)return;
  dashboardInFlight=true;
- refreshing=true;renderHeader();
+ refreshing=true;
+ if(!orders.length&&!error)notice='Cargando comandas desde el servidor…';
+ renderHeader();renderMain();
  try{
   const res=await fetchDashboard();
-  orders=res.orders||[];counts=res.counts||null;updatedAt=res.generatedAt||new Date().toISOString();error='';
+  orders=res.orders||[];counts=res.counts||null;updatedAt=res.generatedAt||new Date().toISOString();error='';notice='';
   saveDashboardCache();
  }catch(e){
+  notice='';
   if(authFailed(e)){clearInterval(refreshTimer);clearInterval(clockTimer);clearSession();render();return;}
   error=e.message||'Error de conexión';
  }
@@ -325,16 +329,13 @@ function renderHeader(){
 }
 function renderMain(){
  const el=$('main-slot');if(!el)return;
- if(loading){
-  el.innerHTML=`<main><div class="grid">${[0,1,2,3].map(()=>`<div><div class="skeleton" style="height:20px;width:128px;margin-bottom:12px"></div><div class="skeleton" style="height:112px;margin-bottom:12px"></div><div class="skeleton" style="height:112px"></div></div>`).join('')}</div></main>`;
-  return;
- }
  const f=filteredOrders();
  const news=f.filter(o=>o.orderStatus==='NEW');
  const kitchen=f.filter(o=>o.orderStatus==='IN_KITCHEN');
  const pickups=f.filter(o=>o.orderStatus==='DELIVERED'&&['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus));
  const delivered=f.filter(o=>o.orderStatus==='DELIVERED'&&!['PENDING','REQUESTED','ON_THE_WAY'].includes(o.pickupStatus));
  el.innerHTML=`<main>
+ ${notice&&!error?`<div class="info-banner"><span class="dot-live"></span><p>${esc(notice)}</p></div>`:''}
  ${error?`<div class="err-banner"><p>${esc(error)}</p><button type="button" class="retry-btn" id="retry-btn">Reintentar</button></div>`:''}
  <div class="grid">
   ${columnHTML('Nuevas','#f87171',counts?.new??news.length,news,'Sin comandas nuevas')}
@@ -439,8 +440,9 @@ function render(){
  renderHeader();renderMain();renderDrawer();
 }
 function startApp(){
+ loading=false;notice='';
+ if(!restoreDashboardCache())notice='Cargando comandas desde el servidor…';
  render();
- if(restoreDashboardCache()){renderHeader();renderMain();}
  loadDashboard();
  clearInterval(refreshTimer);
  refreshTimer=setInterval(()=>{if(!selectedId)loadDashboard();},REFRESH_MS);
