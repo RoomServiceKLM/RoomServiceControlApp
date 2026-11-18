@@ -136,7 +136,9 @@ const API_URL='https://roomservice-operations-api.roomservicekimptonlosmonteros.
 const STAFF_KEY='rs_staff_name';
 const TOKEN_KEY='rs_session_token';
 const USER_KEY='rs_user_id';
-const REFRESH_MS=20000;
+const REFRESH_MS=60000;
+const DASH_CACHE_KEY='rs_dashboard_cache_v2';
+const DASH_MODE_KEY='rs_dashboard_mode_v2';
 const STATIC_USERS=[
  {userId:'USR-MARLEN',displayName:'Marlen Andrade'},
  {userId:'USR-SANDRA',displayName:'Sandra Rivera'},
@@ -168,6 +170,7 @@ let selectedUserName='',loginError='';
 let orders=[],counts=null,loading=true,error='',updatedAt='',selectedId=null,search='',refreshing=false;
 let detail=null,detailLoading=false,detailError='',actionError='',busy='',deliveryType='TRAY';
 let refreshTimer=null,clockTimer=null,dashboardInFlight=false;
+let dashboardMode=localStorage.getItem(DASH_MODE_KEY)||'';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fmtTime(iso){if(!iso)return'--:--';const d=new Date(iso);return isNaN(d)?'--:--':d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});}
@@ -189,6 +192,44 @@ async function api(action,payload={}){
   throw e;
  }finally{clearTimeout(t);}
 }
+function readDashboardCache(){
+ try{
+  const raw=localStorage.getItem(DASH_CACHE_KEY);
+  if(!raw)return null;
+  const data=JSON.parse(raw);
+  if(!data||!Array.isArray(data.orders)||!data.updatedAt)return null;
+  return data;
+ }catch(e){return null;}
+}
+function saveDashboardCache(){
+ try{
+  const raw=JSON.stringify({orders,counts,updatedAt});
+  if(raw.length>3500000)throw new Error('Caché demasiado grande');
+  localStorage.setItem(DASH_CACHE_KEY,raw);
+ }catch(e){try{localStorage.removeItem(DASH_CACHE_KEY);}catch(_){}}
+}
+function restoreDashboardCache(){
+ const cached=readDashboardCache();
+ if(!cached)return false;
+ orders=cached.orders;counts=cached.counts||null;updatedAt=cached.updatedAt;loading=false;
+ return true;
+}
+function saveDashboardMode(mode){
+ dashboardMode=mode;
+ try{localStorage.setItem(DASH_MODE_KEY,mode);}catch(e){}
+}
+async function fetchDashboard(){
+ if(dashboardMode==='legacy')return api('dashboard');
+ try{
+  const res=await api('dashboardLite');
+  saveDashboardMode('lite');
+  return res;
+ }catch(e){
+  if(!String(e.message||'').includes('Acción POST no reconocida'))throw e;
+  saveDashboardMode('legacy');
+  return api('dashboard');
+ }
+}
 function clearSession(){
  localStorage.removeItem(STAFF_KEY);localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(USER_KEY);
  staffName='';sessionToken='';userId='';selectedId=null;detail=null;
@@ -198,19 +239,14 @@ async function logout(){
  if(sessionToken){try{await api('logout');}catch(e){}}
  clearInterval(refreshTimer);clearInterval(clockTimer);clearSession();render();
 }
-async function loadDashboard(silent=false){
+async function loadDashboard(){
  if(dashboardInFlight)return;
  dashboardInFlight=true;
- if(!silent){refreshing=true;renderHeader();}
+ refreshing=true;renderHeader();
  try{
-  let res;
-  try{
-   res=await api('dashboardLite');
-  }catch(e){
-   if(!String(e.message||'').includes('Acción POST no reconocida'))throw e;
-   res=await api('dashboard');
-  }
+  const res=await fetchDashboard();
   orders=res.orders||[];counts=res.counts||null;updatedAt=res.generatedAt||new Date().toISOString();error='';
+  saveDashboardCache();
  }catch(e){
   if(authFailed(e)){clearInterval(refreshTimer);clearInterval(clockTimer);clearSession();render();return;}
   error=e.message||'Error de conexión';
@@ -230,7 +266,7 @@ async function loadDetail(){
 }
 async function runAction(key,fn){
  busy=key;actionError='';renderDrawer();
- try{await fn();await loadDetail();loadDashboard(true);}
+ try{await fn();await loadDetail();loadDashboard();}
  catch(e){
   if(authFailed(e)){clearInterval(refreshTimer);clearInterval(clockTimer);clearSession();render();return;}
   actionError=e.message||'La acción no se pudo completar';
@@ -278,7 +314,7 @@ function renderHeader(){
    </button>
    <button type="button" class="staff-btn" id="staff-btn" title="Cerrar sesión">${esc(staffName)}</button>
   </div></div>
-  ${updatedAt&&!error?`<p class="updated">Actualizado ${fmtTime(updatedAt)} · auto cada 20 s</p>`:''}
+  ${updatedAt&&!error?`<p class="updated">${refreshing?'Actualizando…':'Actualizado '+fmtTime(updatedAt)} · auto cada 60 s</p>`:''}
  </header>`;
  $('refresh-btn').onclick=()=>loadDashboard();
  $('staff-btn').onclick=()=>{if(confirm('¿Cerrar la sesión de '+staffName+'?'))logout();};
@@ -403,9 +439,11 @@ function render(){
  renderHeader();renderMain();renderDrawer();
 }
 function startApp(){
- render();loading=true;loadDashboard();
+ render();
+ if(restoreDashboardCache()){renderHeader();renderMain();}
+ loadDashboard();
  clearInterval(refreshTimer);
- refreshTimer=setInterval(()=>{if(!selectedId)loadDashboard(true);},REFRESH_MS);
+ refreshTimer=setInterval(()=>{if(!selectedId)loadDashboard();},REFRESH_MS);
  clearInterval(clockTimer);
  clockTimer=setInterval(()=>{const c=$('clock');if(c)c.textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});},30000);
 }
